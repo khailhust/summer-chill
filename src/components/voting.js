@@ -244,9 +244,11 @@ export function renderVoting() {
             </div>
 
             <!-- Add custom option -->
-            <div x-show="poll.status === 'open'" style="display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4);">
-              <input type="text" class="input" style="flex: 1; min-width: 200px; padding: 8px 12px; font-size: var(--fs-sm); background: rgba(255,255,255,0.02); border: 1px dashed var(--border-glass);" placeholder="Thêm lựa chọn khác..." x-model="poll.newOptionText" @keydown.enter="addCustomOption(poll)">
-              <button class="btn" style="padding: 8px 16px; font-size: var(--fs-sm); font-weight: bold; background: rgba(52, 211, 153, 0.15); color: var(--emerald-400); border: 1px solid var(--emerald-400);" @click="addCustomOption(poll)" x-show="poll.newOptionText && poll.newOptionText.trim().length > 0">Thêm</button>
+            <div x-show="poll.status === 'open'" style="margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.1); border-radius: var(--radius-md); border: 1px dashed var(--border-glass);">
+              <input type="text" class="input" style="width: 100%; padding: 10px 12px; font-size: var(--fs-sm); background: rgba(255,255,255,0.05); border: 1px solid transparent; border-radius: var(--radius-sm);" placeholder="Thêm lựa chọn khác..." x-model="poll.newOptionText" @keydown.enter="addCustomOption(poll)">
+              <div style="text-align: right; margin-top: 12px;" x-show="poll.newOptionText && poll.newOptionText.trim().length > 0">
+                <button class="btn" style="padding: 8px 20px; font-size: var(--fs-sm); font-weight: bold; background: rgba(52, 211, 153, 0.15); color: var(--emerald-400); border: 1px solid var(--emerald-400);" @click="addCustomOption(poll)">Thêm</button>
+              </div>
             </div>
 
             <div style="margin-top: var(--space-4); font-size: var(--fs-xs); color: var(--text-secondary); display: flex; justify-content: space-between;">
