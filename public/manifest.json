@@ -1,0 +1,17 @@
+{
+  "name": "Summer Chill 2026",
+  "short_name": "Summer Chill",
+  "description": "Dashboard lên kế hoạch chuyến đi Sóc Sơn",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1f0f",
+  "theme_color": "#34D399",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

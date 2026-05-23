@@ -1,0 +1,114 @@
+/* Landing Page Styles */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/images/resort/view-chieu-hang-hon.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  z-index: -2;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(15, 31, 15, 0.4), rgba(15, 31, 15, 0.9));
+  z-index: -1;
+}
+
+.hero-title {
+  font-size: 4rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  margin-bottom: var(--space-4);
+  letter-spacing: 3px;
+}
+
+.hero-slogan {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-body);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.6;
+  max-width: 550px;
+  margin: 0 auto var(--space-8) auto;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.countdown-container {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  margin-bottom: var(--space-8);
+}
+
+.countdown-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 90px;
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  padding: 1.2rem 0.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+.countdown-number {
+  font-size: 3rem;
+  font-family: var(--font-heading);
+  color: #ffffff;
+  font-weight: 700;
+  text-shadow: 0 0 15px rgba(52, 211, 153, 0.8), 0 2px 4px rgba(0,0,0,0.5);
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.countdown-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 500;
+}
+
+.resort-info-grid, .map-section-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .resort-info-grid {
+    grid-template-columns: 1fr 1.5fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .resort-info-grid {
+    grid-template-columns: 1fr 1.8fr;
+  }
+  .map-section-grid {
+    grid-template-columns: 1fr 2fr;
+  }
+}
