@@ -14,6 +14,7 @@ export function renderHero() {
     Alpine.data('heroComponent', () => ({
       countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
       interval: null,
+      leafColors: ['#fbbf24', '#f59e0b', '#d97706', '#ea580c', '#c2410c', '#84cc16', '#65a30d', '#a16207'],
       init() {
         this.interval = setupCountdown(TRIP_DATA.startDate, (data) => {
           this.countdown = data;
@@ -31,9 +32,22 @@ export function renderHero() {
       <div class="hero-overlay"></div>
       
       <!-- Leaf particles -->
-      <div style="position: absolute; inset: 0; overflow: hidden; pointer-events: none;">
-        <template x-for="i in 15" :key="i">
-          <div class="leaf" :style="'left: ' + (Math.random() * 100) + '%; animation-duration: ' + (5 + Math.random() * 10) + 's; animation-delay: ' + (Math.random() * 5) + 's;'">🍃</div>
+      <div style="position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1;">
+        <template x-for="i in 25" :key="i">
+          <div class="leaf" 
+               :style="\`
+                 left: \${Math.random() * 100}%; 
+                 animation-duration: \${6 + Math.random() * 10}s; 
+                 animation-delay: \${Math.random() * 5}s;
+                 color: \${leafColors[Math.floor(Math.random() * leafColors.length)]};
+                 opacity: \${0.3 + Math.random() * 0.5};
+                 font-size: \${0.8 + Math.random() * 1.2}rem;
+                 filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+               \`">
+            <svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" style="display: block;">
+              <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 7,14 7,14C7,14 14,8 20,7C20,7 20.65,7 21,7.2C21,7.2 19.38,7 17,8Z"/>
+            </svg>
+          </div>
         </template>
       </div>
 
@@ -58,19 +72,19 @@ export function renderHero() {
         </div>
 
         <div class="countdown-container">
-          <div class="glass-card countdown-box">
+          <div class="glass-card countdown-box hover-glow">
             <span class="countdown-number" x-text="countdown.days">0</span>
             <span class="countdown-label">Ngày</span>
           </div>
-          <div class="glass-card countdown-box">
+          <div class="glass-card countdown-box hover-glow">
             <span class="countdown-number" x-text="countdown.hours.toString().padStart(2, '0')">00</span>
             <span class="countdown-label">Giờ</span>
           </div>
-          <div class="glass-card countdown-box">
+          <div class="glass-card countdown-box hover-glow">
             <span class="countdown-number" x-text="countdown.minutes.toString().padStart(2, '0')">00</span>
             <span class="countdown-label">Phút</span>
           </div>
-          <div class="glass-card countdown-box">
+          <div class="glass-card countdown-box hover-glow">
             <span class="countdown-number" x-text="countdown.seconds.toString().padStart(2, '0')">00</span>
             <span class="countdown-label">Giây</span>
           </div>

@@ -43,8 +43,8 @@ export function renderSchedule() {
         return app.isAdmin || (app.user?.uid === uid);
       },
 
-      getHourOptions(selected = '08', includeEmpty = false) {
-        let html = includeEmpty ? `<option value="">--</option>` : '';
+      getHourOptions(selected = '08') {
+        let html = '';
         for(let i=0; i<24; i++) {
           const v = i.toString().padStart(2, '0');
           html += `<option value="${v}" ${v === selected ? 'selected' : ''}>${v}</option>`;
@@ -88,7 +88,7 @@ export function renderSchedule() {
                 <label style="display: block; margin-bottom: var(--space-2);">Giờ kết thúc</label>
                 <div style="display: flex; gap: var(--space-1); align-items: center;">
                   <select id="sch-end-h" class="select" style="padding: var(--space-2); flex: 1;">
-                    ${this.getHourOptions('', true)}
+                    ${this.getHourOptions('00')}
                   </select>
                   <span>:</span>
                   <select id="sch-end-m" class="select" style="padding: var(--space-2); flex: 1;">
@@ -186,7 +186,7 @@ export function renderSchedule() {
                 <label style="display: block; margin-bottom: var(--space-2);">Giờ kết thúc</label>
                 <div style="display: flex; gap: var(--space-1); align-items: center;">
                   <select id="sch-end-h-edit" class="select" style="padding: var(--space-2); flex: 1;">
-                    ${this.getHourOptions(item.endTime ? item.endTime.split(':')[0] : '', true)}
+                    ${this.getHourOptions(item.endTime ? item.endTime.split(':')[0] : '00')}
                   </select>
                   <span>:</span>
                   <select id="sch-end-m-edit" class="select" style="padding: var(--space-2); flex: 1;">

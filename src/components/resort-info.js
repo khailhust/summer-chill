@@ -65,7 +65,7 @@ export function renderResortInfo() {
           <h4 style="margin-bottom: var(--space-4); color: var(--emerald-400); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">Tiện ích nổi bật</h4>
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-4);">
             ${RESORT_DATA.amenities.map(a => `
-              <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s;">
+              <div class="amenity-card">
                 <span style="font-size: 1.5rem; flex-shrink: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">${a.icon}</span>
                 <span style="font-size: 0.95rem; font-weight: 500; color: var(--text-primary); line-height: 1.3;">${a.name}</span>
               </div>

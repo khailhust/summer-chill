@@ -21,6 +21,13 @@
   background-position: center;
   background-attachment: fixed;
   z-index: -2;
+  animation: slowZoom 20s ease-in-out infinite alternate;
+  transform-origin: center center;
+}
+
+@keyframes slowZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
 }
 
 .hero-overlay {

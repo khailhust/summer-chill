@@ -9,7 +9,7 @@ export function renderMapSection() {
         <div class="reveal-on-scroll" style="display: flex; flex-direction: column; gap: var(--space-4); justify-content: center;">
           <h2 style="font-size: var(--fs-4xl); font-family: var(--font-heading); color: var(--emerald-400); margin-bottom: var(--space-4); text-transform: uppercase; letter-spacing: 1px;">Di chuyển</h2>
           
-          <div style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 16px;">
+          <div class="hover-glow" style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 16px;">
             <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(56, 189, 248, 0.1); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.2);">🚗</div>
             <div>
               <p style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Phương tiện</p>
@@ -17,7 +17,7 @@ export function renderMapSection() {
             </div>
           </div>
 
-          <div style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 16px;">
+          <div class="hover-glow" style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 16px;">
             <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(251, 191, 36, 0.1); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.2);">📍</div>
             <div>
               <p style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Khoảng cách từ HN</p>
@@ -25,7 +25,7 @@ export function renderMapSection() {
             </div>
           </div>
 
-          <div style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 16px;">
+          <div class="hover-glow" style="background: rgba(255,255,255,0.03); padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 16px;">
             <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(167, 139, 250, 0.1); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(167, 139, 250, 0.2);">⏱️</div>
             <div>
               <p style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Thời gian di chuyển</p>

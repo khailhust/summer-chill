@@ -9,9 +9,9 @@ export function renderActivities() {
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-6);">
         ${ACTIVITIES.map((act, index) => `
-          <div class="glass-card glass-card-interactive reveal-on-scroll" style="transition-delay: ${index * 100}ms; border: 1px solid rgba(255,255,255,0.05); background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%); display: flex; flex-direction: column; align-items: center; text-align: center; padding: 2.5rem 1.5rem; overflow: hidden; position: relative;">
+          <div class="glass-card glass-card-interactive reveal-on-scroll activity-card" style="--act-color: var(--${act.color}-400); transition-delay: ${index * 100}ms; border: 1px solid rgba(255,255,255,0.05); background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%); display: flex; flex-direction: column; align-items: center; text-align: center; padding: 2.5rem 1.5rem; overflow: hidden; position: relative;">
             
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--${act.color}-400), transparent); opacity: 0.5;"></div>
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--act-color), transparent); opacity: 0.5;"></div>
 
             <div style="width: 80px; height: 80px; border-radius: 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 2.8rem; margin-bottom: 1.5rem; box-shadow: inset 0 0 30px rgba(255,255,255,0.05), 0 8px 16px rgba(0,0,0,0.2); position: relative;">
               <div style="position: absolute; inset: 0; border-radius: 24px; box-shadow: inset 0 0 20px var(--${act.color}-400); opacity: 0.3;"></div>
