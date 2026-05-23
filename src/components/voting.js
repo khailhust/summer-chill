@@ -153,7 +153,7 @@ export function renderVoting() {
   return `
     <div x-data="votingComponent" style="max-width: 800px; margin: 0 auto; padding-bottom: var(--space-16);">
       
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-8);">
+      <div class="voting-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-8);">
         <h2 style="font-size: var(--fs-2xl); color: var(--emerald-400);">Trưng cầu dân ý 🗳️</h2>
         <button class="btn btn-primary" @click="openAddModal()">+ Tạo bình chọn</button>
       </div>

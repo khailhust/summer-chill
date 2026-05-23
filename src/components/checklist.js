@@ -126,7 +126,7 @@ export function renderChecklist() {
       
       <!-- Left Panel: Checklist -->
       <div>
-        <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-6); overflow-x: auto; padding-bottom: var(--space-2);">
+        <div class="checklist-filter-bar" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-6); overflow-x: auto; padding-bottom: var(--space-2);">
           <button class="nav-tab" :class="filter === 'all' ? 'active' : ''" @click="filter = 'all'">Tất cả</button>
           <button class="nav-tab" :class="filter === 'pending' ? 'active' : ''" @click="filter = 'pending'">Chưa xong</button>
           <button class="nav-tab" :class="filter === 'completed' ? 'active' : ''" @click="filter = 'completed'">Đã xong</button>
@@ -194,7 +194,7 @@ export function renderChecklist() {
             </div>
 
             <!-- Add new item -->
-            <div style="display: flex; gap: var(--space-2);">
+            <div class="checklist-add-form" style="display: flex; gap: var(--space-2);">
               <input type="text" class="input" placeholder="Thêm đồ cần chuẩn bị..." x-model="newItemName['${cat.id}']" @keydown.enter="addItem('${cat.id}')" style="flex: 2;" />
               <input type="text" class="input" placeholder="SL (VD: 2kg)" x-model="newItemQty['${cat.id}']" @keydown.enter="addItem('${cat.id}')" style="flex: 1;" />
               <button class="btn btn-primary" @click="addItem('${cat.id}')">Thêm</button>

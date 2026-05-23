@@ -93,3 +93,65 @@
   transform: translateY(-5px);
   z-index: 10;
 }
+
+/* Mobile Responsiveness for Dashboard */
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding-bottom: 120px; /* Space for floating music player */
+  }
+
+  .navbar {
+    padding: 0 var(--space-3);
+  }
+
+  /* Hide Logo when in Dashboard on Mobile to save space for tabs */
+  .navbar.dashboard-mode .navbar-logo {
+    display: none;
+  }
+
+  .navbar-dashboard-content {
+    gap: var(--space-3);
+    width: 100%;
+  }
+
+  .navbar-tabs {
+    margin-left: 0 !important;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 4px; /* Space for touch scroll */
+    -webkit-overflow-scrolling: touch;
+    flex: 1; /* Allow taking up remaining space */
+  }
+
+  /* Hide scrollbar for cleaner look */
+  .navbar-tabs::-webkit-scrollbar,
+  .checklist-filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-tab {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.85rem;
+  }
+
+  .navbar-members {
+    transform: scale(0.9);
+  }
+
+  /* Checklist form stacking */
+  .checklist-add-form {
+    flex-wrap: wrap;
+  }
+  .checklist-add-form input:first-child {
+    flex: 100% !important;
+  }
+  .checklist-add-form input:nth-child(2) {
+    flex: 1 !important;
+  }
+
+  /* Voting header */
+  .voting-header {
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+}
