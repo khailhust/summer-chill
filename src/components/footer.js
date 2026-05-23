@@ -11,7 +11,7 @@ export function renderFooter() {
             SummerChill
           </h2>
           <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; line-height: 1.6;">
-            ${TRIP_DATA.slogan}
+            Ứng dụng hỗ trợ lên kế hoạch, quản lý lịch trình, chi phí và biểu quyết dành riêng cho những chuyến đi chơi của nhóm bạn. Mọi thứ bạn cần cho một chuyến đi hoàn hảo đều nằm gọn tại đây!
           </p>
         </div>
 
