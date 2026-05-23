@@ -18,18 +18,6 @@ export function renderDashboard() {
             </h1>
             <p style="color: var(--text-secondary); margin-top: var(--space-1);">Cùng xây dựng chuyến đi thật cháy nào!</p>
           </div>
-          
-          <div class="glass-card hover-glow" style="padding: var(--space-2) var(--space-4); display: flex; align-items: center; gap: var(--space-4); cursor: pointer;" onclick="window.showMembers()" title="Xem danh sách thành viên">
-            <div style="text-align: right;">
-              <p style="font-size: var(--fs-xs); color: var(--text-secondary); text-transform: uppercase;">Thành viên</p>
-              <p style="font-size: var(--fs-lg); font-weight: bold; color: var(--golden-400);" x-text="Object.keys($store.app.members || {}).length">0</p>
-            </div>
-            <div style="width: 1px; height: 30px; background: var(--border-glass);"></div>
-            <div style="text-align: right;">
-              <p style="font-size: var(--fs-xs); color: var(--text-secondary); text-transform: uppercase;">Online</p>
-              <p style="font-size: var(--fs-lg); font-weight: bold; color: var(--emerald-400);" x-text="Object.values($store.app.members || {}).filter(m => m.isOnline).length">0</p>
-            </div>
-          </div>
         </div>
 
         <!-- Tab Contents -->

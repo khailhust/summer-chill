@@ -35,12 +35,15 @@ export function renderNavbar() {
 
           <!-- Members List -->
           <div class="navbar-members" style="cursor: pointer;" onclick="window.showMembers()" title="Xem danh sách thành viên">
-            <template x-for="id in Object.keys($store.app.members)" :key="id">
-              <div class="avatar" :title="$store.app.members[id].name">
+            <template x-for="(id, index) in Object.keys($store.app.members).sort((a,b) => ($store.app.members[b].isOnline ? 1 : 0) - ($store.app.members[a].isOnline ? 1 : 0)).slice(0, 3)" :key="id">
+              <div class="avatar" :title="$store.app.members[id].name" :style="'z-index: ' + (10 - index) + ';'">
                 <div style="width: 100%; height: 100%; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center;" x-html="window.renderAvatarHtml($store.app.members[id].avatar)"></div>
                 <div x-show="$store.app.members[id].isOnline" class="avatar-online-dot animate-pulse-dot" style="display: none;"></div>
               </div>
             </template>
+            <div x-show="Object.keys($store.app.members).length > 3" class="avatar" style="background: var(--bg-surface); z-index: 1; font-size: 0.8rem; font-weight: bold; color: var(--text-secondary); border-color: var(--text-dim);" style="display: none;">
+              <span x-text="'+' + (Object.keys($store.app.members).length - 3)"></span>
+            </div>
           </div>
         </div>
 
