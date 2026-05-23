@@ -47,6 +47,12 @@ document.addEventListener('alpine:init', () => {
     init() {
       window.addEventListener('hashchange', () => {
         this.route = window.location.hash || '#/';
+        
+        // Luôn cuộn lên đầu trang khi về Landing Page
+        if (this.route === '#/') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         this.checkAuthAndRoute();
         setTimeout(() => window.setupScrollAnimations(), 100);
       });
