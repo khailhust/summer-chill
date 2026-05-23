@@ -72,17 +72,27 @@ export function renderExpenses() {
             </div>
             <div>
               <label style="display: block; margin-bottom: var(--space-2);">Người trả</label>
-              <select id="exp-payer" class="select">
+              <div style="display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto; background: rgba(0,0,0,0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed var(--border-glass);">
                 <template x-data x-for="[uid, m] in Object.entries($store.app.members)" :key="uid">
-                  <option :value="uid" :selected="uid === '${myUid}'" x-text="m.name"></option>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="exp-payer" :value="uid" :checked="uid === '${myUid}'" style="accent-color: var(--emerald-400); width: 16px; height: 16px;" />
+                    <div class="avatar" style="width: 20px; height: 20px; font-size: 10px; overflow: hidden;">
+                      <div style="width: 100%; height: 100%; border-radius: 50%;" x-html="window.renderAvatarHtml(m.avatar || '👤')"></div>
+                    </div> 
+                    <span x-text="m.name" style="font-size: 0.95rem;"></span>
+                  </label>
                 </template>
-              </select>
+              </div>
             </div>
             <div>
               <label style="display: block; margin-bottom: var(--space-2);">Phân loại</label>
               <select id="exp-cat" class="select">
                 ${Object.entries(EXPENSE_CATEGORIES).map(([k, v]) => `<option value="${k}">${v.icon} ${v.name}</option>`).join('')}
               </select>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: var(--space-2);">Ghi chú thêm</label>
+              <textarea id="exp-note" class="textarea" rows="2" placeholder="VD: Gồm 2 vé người lớn, 1 vé trẻ em..."></textarea>
             </div>
           </div>
         `;
@@ -92,8 +102,12 @@ export function renderExpenses() {
           const amountInput = document.getElementById('exp-amount');
           const title = titleInput.value.trim();
           const amount = parseInt(amountInput.value, 10);
-          const paidBy = document.getElementById('exp-payer').value;
+          
+          const payerCheckboxes = document.querySelectorAll('input[name="exp-payer"]:checked');
+          const paidBy = Array.from(payerCheckboxes).map(cb => cb.value);
+          
           const category = document.getElementById('exp-cat').value;
+          const note = document.getElementById('exp-note').value.trim();
 
           let isValid = true;
           
@@ -118,7 +132,7 @@ export function renderExpenses() {
           if (!isValid) return false;
 
           try {
-            await addExpense({ title, amount, paidBy, category });
+            await addExpense({ title, amount, paidBy, category, note });
             showToast('Đã thêm khoản chi', 'success');
             return true;
           } catch (e) {
@@ -187,12 +201,17 @@ export function renderExpenses() {
                 <div style="font-size: 2rem; width: 40px; text-align: center;" x-text="getCategoryIcon(exp.category)"></div>
                 <div>
                   <div style="font-weight: 500; font-size: var(--fs-lg);" x-text="exp.title"></div>
-                  <div style="font-size: var(--fs-sm); color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
-                    Người trả: 
-                    <div class="avatar" style="width: 18px; height: 18px; font-size: 10px; overflow: hidden;">
-                      <div style="width: 100%; height: 100%; border-radius: 50%;" x-html="window.renderAvatarHtml(getMemberAvatar(exp.paidBy))"></div>
-                    </div> 
-                    <span x-text="getMemberName(exp.paidBy)"></span>
+                  <div style="font-size: var(--fs-sm); color: var(--text-dim); margin-top: 2px; margin-bottom: 6px;" x-show="exp.note" x-text="exp.note"></div>
+                  <div style="font-size: var(--fs-sm); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span style="opacity: 0.8;">Người trả:</span>
+                    <template x-for="uid in (Array.isArray(exp.paidBy) ? exp.paidBy : [exp.paidBy])" :key="uid">
+                      <div style="display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div class="avatar" style="width: 14px; height: 14px; font-size: 8px; overflow: hidden;">
+                          <div style="width: 100%; height: 100%; border-radius: 50%;" x-html="window.renderAvatarHtml(getMemberAvatar(uid))"></div>
+                        </div> 
+                        <span x-text="getMemberName(uid)" style="font-size: 0.8rem;"></span>
+                      </div>
+                    </template>
                   </div>
                 </div>
               </div>
