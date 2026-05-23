@@ -11,7 +11,7 @@ export function renderDashboard() {
     <div class="dashboard-layout">
       <div class="container dashboard-content">
         <!-- Dashboard Header / Welcome -->
-        <div style="margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: center;" class="animate-fade-up">
+        <div style="margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);" class="animate-fade-up">
           <div>
             <h1 style="font-size: var(--fs-3xl); color: var(--emerald-400); font-family: var(--font-heading);">
               Chào <span x-text="$store.app.user?.displayName || 'bạn'"></span>! 👋

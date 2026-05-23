@@ -147,8 +147,7 @@
     padding-bottom: 4px; /* Space for touch scroll */
     -webkit-overflow-scrolling: touch;
     width: 100%;
-    mask-image: linear-gradient(to right, black 90%, transparent 100%); /* Fade out end to indicate scrollable */
-    -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+    padding-right: var(--space-6); /* Prevent last tab from touching edge */
   }
 
   /* Hide scrollbar for cleaner look */

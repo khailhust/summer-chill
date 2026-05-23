@@ -144,3 +144,16 @@
   margin: 0 auto;
   padding: 0 var(--space-4);
 }
+
+/* Mobile Adjustments for Components */
+@media (max-width: 768px) {
+  .glass-card {
+    padding: var(--space-4);
+  }
+
+  .badge {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.4;
+  }
+}
