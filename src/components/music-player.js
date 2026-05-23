@@ -15,16 +15,20 @@ export function renderMusicPlayer() {
         // Tự động phát khi người dùng tương tác lần đầu với trang
         const playOnInteract = () => {
           if (!this.hasInteracted) {
-            this.play();
-            this.hasInteracted = true;
-            // Xoá sự kiện sau khi đã tương tác
-            document.removeEventListener('click', playOnInteract);
-            document.removeEventListener('touchstart', playOnInteract);
+            this.audio.play().then(() => {
+              this.isPlaying = true;
+              this.hasInteracted = true;
+              // Chỉ xoá sự kiện khi đã phát thành công
+              document.removeEventListener('click', playOnInteract);
+              document.removeEventListener('touchend', playOnInteract);
+            }).catch(e => {
+              console.warn("Autoplay chưa sẵn sàng, đợi thao tác click tiếp theo.", e);
+            });
           }
         };
 
         document.addEventListener('click', playOnInteract);
-        document.addEventListener('touchstart', playOnInteract);
+        document.addEventListener('touchend', playOnInteract);
       },
 
       toggle() {
