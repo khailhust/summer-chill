@@ -76,9 +76,9 @@ export function renderHero() {
           </div>
         </div>
 
-        <a href="#/dashboard" class="btn btn-primary" style="font-size: var(--fs-lg); padding: var(--space-3) var(--space-8);">
-          Vào Dashboard
-        </a>
+        <a href="#/dashboard" class="btn btn-primary" style="font-size: var(--fs-xl); padding: var(--space-4) var(--space-8); border-radius: var(--radius-xl); box-shadow: 0 10px 30px var(--glow-golden);">
+        Tham gia ngay
+      </a>
       </div>
     </section>
   `;

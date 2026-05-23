@@ -8,7 +8,7 @@ export function renderNavbar() {
       
       <!-- Hiển thị khi ở landing page -->
       <div x-show="!$store.app.isDashboard" style="display: none;">
-        <a href="#/dashboard" class="btn btn-primary">Lên kế hoạch <span x-show="!$store.app.isOnline"> (Offline)</span></a>
+        <a href="#/dashboard" class="btn btn-primary">Tham gia ngay <span x-show="!$store.app.isOnline"> (Offline)</span></a>
       </div>
 
       <!-- Hiển thị khi ở dashboard -->
