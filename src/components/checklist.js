@@ -35,7 +35,7 @@ const renderItemTemplate = (iteratorStr) => `
       </div>
 
       <!-- Right actions -->
-      <div style="display: flex; align-items: center; gap: var(--space-4);">
+      <div class="checklist-actions" style="display: flex; align-items: center; gap: var(--space-4);">
         
         <!-- Avatar dropdown for assignment -->
         <div>

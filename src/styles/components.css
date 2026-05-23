@@ -247,6 +247,19 @@
   .checklist-item-text {
     font-size: var(--fs-lg);
   }
+  .checklist-item-card {
+    flex-wrap: wrap;
+  }
+  .checklist-row-wrapper {
+    min-width: 100%;
+  }
+  .checklist-actions {
+    width: 100%;
+    justify-content: flex-end;
+    padding-left: 32px; /* Indent past checkbox */
+    padding-top: var(--space-2);
+    border-top: 1px dashed rgba(255,255,255,0.1);
+  }
 }
 
 .checklist-grid {
