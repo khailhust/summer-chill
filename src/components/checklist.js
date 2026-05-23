@@ -348,7 +348,7 @@ export function renderChecklist() {
   });
 
   return `
-    <div x-data="checklistComponent" style="display: grid; grid-template-columns: 1fr; gap: var(--space-8); @media(min-width: 1024px) { grid-template-columns: 2fr 1fr; }">
+    <div x-data="checklistComponent" class="checklist-grid">
       
       <div>
         <div class="checklist-filter-bar" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-6); overflow-x: auto; padding-bottom: var(--space-2);">
@@ -394,74 +394,78 @@ export function renderChecklist() {
 
       <!-- Right Panel: Progress Tracker -->
       <div style="position: sticky; top: 100px; height: fit-content;">
-        <div class="glass-card" style="text-align: center; margin-bottom: var(--space-6);">
-          <h3 style="margin-bottom: var(--space-4); color: var(--golden-400);">Tiến độ chuẩn bị</h3>
-          
-          <!-- Circular Progress -->
-          <div style="display: flex; justify-content: center; gap: var(--space-6); margin-bottom: var(--space-4);">
-            
-            <!-- My Progress -->
-            <div style="text-align: center;" x-show="myTotalItems > 0">
-              <div style="position: relative; width: 100px; height: 100px; margin: 0 auto var(--space-2) auto;">
-                <svg width="100" height="100" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="var(--golden-400)" stroke-width="8" 
-                          stroke-dasharray="263.89" 
-                          :stroke-dashoffset="263.89 - (263.89 * myProgressPercent) / 100" 
-                          style="transition: stroke-dashoffset 1s ease-out;" />
-                </svg>
-                <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                  <span style="font-size: var(--fs-xl); font-weight: bold; font-family: var(--font-heading); color: var(--golden-400);" x-text="myProgressPercent + '%'"></span>
-                </div>
-              </div>
-              <div style="font-size: var(--fs-sm); font-weight: bold; color: var(--golden-400);">Của tôi</div>
-              <div style="font-size: var(--fs-xs); color: var(--text-dim);"><span x-text="myCompletedItems"></span> / <span x-text="myTotalItems"></span> xong</div>
-            </div>
-
-            <!-- Overall Progress -->
-            <div style="text-align: center;">
-              <div style="position: relative; width: 100px; height: 100px; margin: 0 auto var(--space-2) auto;">
-                <svg width="100" height="100" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="var(--emerald-400)" stroke-width="8" 
-                          stroke-dasharray="263.89" 
-                          :stroke-dashoffset="263.89 - (263.89 * progressPercent) / 100" 
-                          style="transition: stroke-dashoffset 1s ease-out;" />
-                </svg>
-                <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                  <span style="font-size: var(--fs-xl); font-weight: bold; font-family: var(--font-heading); color: var(--emerald-400);" x-text="progressPercent + '%'"></span>
-                </div>
-              </div>
-              <div style="font-size: var(--fs-sm); font-weight: bold; color: var(--emerald-400);">Chung</div>
-              <div style="font-size: var(--fs-xs); color: var(--text-dim);"><span x-text="completedItems"></span> / <span x-text="totalItems"></span> xong</div>
-            </div>
-
-          </div>
-        </div>
-
         <div class="glass-card">
-          <h4 style="margin-bottom: var(--space-4);">Theo thành viên</h4>
-          
-          <template x-for="(stat, index) in memberStats" :key="stat.uid">
-            <div style="margin-bottom: var(--space-3);">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: var(--fs-sm);">
-                <div style="display: flex; align-items: center; gap: 6px;">
-                  <div style="width: 20px; height: 20px; display: inline-block; overflow: hidden; border-radius: 50%;" x-html="window.renderAvatarHtml(stat.avatar)"></div>
-                  <span x-text="stat.name"></span>
+          <div style="display: flex; gap: var(--space-6);">
+            
+            <!-- Left Side: Circular Progress (Stacked vertically) -->
+            <div style="width: 100px; flex-shrink: 0; text-align: center; border-right: 1px solid var(--border-glass); padding-right: var(--space-4);">
+              <h4 style="margin-bottom: var(--space-4); color: var(--golden-400); font-size: var(--fs-lg); white-space: nowrap;">Tiến độ</h4>
+              
+              <div style="display: flex; flex-direction: column; gap: var(--space-4); align-items: center;">
+                
+                <!-- My Progress -->
+                <div style="text-align: center;" x-show="myTotalItems > 0">
+                  <div style="position: relative; width: 70px; height: 70px; margin: 0 auto var(--space-1) auto;">
+                    <svg width="70" height="70" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--golden-400)" stroke-width="8" 
+                              stroke-dasharray="263.89" 
+                              :stroke-dashoffset="263.89 - (263.89 * myProgressPercent) / 100" 
+                              style="transition: stroke-dashoffset 1s ease-out;" />
+                    </svg>
+                    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                      <span style="font-size: var(--fs-base); font-weight: bold; font-family: var(--font-heading); color: var(--golden-400);" x-text="myProgressPercent + '%'"></span>
+                    </div>
+                  </div>
+                  <div style="font-size: var(--fs-xs); font-weight: bold; color: var(--golden-400);">Của tôi</div>
                 </div>
-                <span><span x-text="stat.completed"></span> / <span x-text="stat.total"></span></span>
-              </div>
-              <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
-                <!-- Dùng array colors: emerald, golden, sky, coral, purple -->
-                <div style="height: 100%; border-radius: 3px; transition: width 0.5s ease;"
-                     :style="'width: ' + (stat.total === 0 ? 0 : (stat.completed / stat.total * 100)) + '%; background: var(--' + ['emerald', 'golden', 'sky', 'coral', 'purple'][index % 5] + '-400);'">
+
+                <!-- Overall Progress -->
+                <div style="text-align: center;">
+                  <div style="position: relative; width: 70px; height: 70px; margin: 0 auto var(--space-1) auto;">
+                    <svg width="70" height="70" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--emerald-400)" stroke-width="8" 
+                              stroke-dasharray="263.89" 
+                              :stroke-dashoffset="263.89 - (263.89 * progressPercent) / 100" 
+                              style="transition: stroke-dashoffset 1s ease-out;" />
+                    </svg>
+                    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                      <span style="font-size: var(--fs-base); font-weight: bold; font-family: var(--font-heading); color: var(--emerald-400);" x-text="progressPercent + '%'"></span>
+                    </div>
+                  </div>
+                  <div style="font-size: var(--fs-xs); font-weight: bold; color: var(--emerald-400);">Chung</div>
                 </div>
+
               </div>
             </div>
-          </template>
 
-          <div x-show="memberStats.length === 0" style="color: var(--text-dim); text-align: center; font-size: var(--fs-sm); font-style: italic;">
-            Chưa có mục nào được phân công.
+            <!-- Right Side: Members Progress -->
+            <div style="flex: 1; overflow: hidden;">
+              <h4 style="margin-bottom: var(--space-4); font-size: var(--fs-lg);">Thành viên</h4>
+              
+              <template x-for="(stat, index) in memberStats" :key="stat.uid">
+                <div style="margin-bottom: var(--space-3);">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: var(--fs-sm);">
+                    <div style="display: flex; align-items: center; gap: 6px; overflow: hidden;">
+                      <div style="width: 20px; height: 20px; flex-shrink: 0; display: inline-block; overflow: hidden; border-radius: 50%;" x-html="window.renderAvatarHtml(stat.avatar)"></div>
+                      <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="stat.name"></span>
+                    </div>
+                    <span style="flex-shrink: 0; margin-left: 8px;"><span x-text="stat.completed"></span> / <span x-text="stat.total"></span></span>
+                  </div>
+                  <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                    <div style="height: 100%; border-radius: 3px; transition: width 0.5s ease;"
+                         :style="'width: ' + (stat.total === 0 ? 0 : (stat.completed / stat.total * 100)) + '%; background: var(--' + ['emerald', 'golden', 'sky', 'coral', 'purple'][index % 5] + '-400);'">
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <div x-show="memberStats.length === 0" style="color: var(--text-dim); text-align: center; font-size: var(--fs-sm); font-style: italic;">
+                Chưa có mục phân công.
+              </div>
+            </div>
+            
           </div>
         </div>
       </div>

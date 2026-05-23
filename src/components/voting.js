@@ -168,12 +168,12 @@ export function renderVoting() {
                   <div class="badge" :class="poll.status === 'open' ? 'emerald' : 'coral'" x-text="poll.status === 'open' ? '🟢 Đang mở' : '🔴 Đã đóng'"></div>
                   <div class="badge sky" x-show="poll.allowMultiple">Nhiều lựa chọn</div>
                 </div>
-                <h3 style="font-size: var(--fs-2xl); color: var(--text-primary); font-family: var(--font-heading);" x-text="poll.title"></h3>
+                <h3 style="font-size: var(--fs-2xl); color: var(--text-primary); font-family: var(--font-body); font-weight: bold;" x-text="poll.title"></h3>
               </div>
               
               <div style="display: flex; align-items: center; gap: var(--space-2);">
                 <span style="font-size: var(--fs-sm); color: var(--text-secondary);" x-text="getTotalVotes(poll) + ' votes'"></span>
-                <button class="btn-icon" @click="delPoll(poll)" x-show="isOwnerOrAdmin(poll.createdBy)" title="Xoá">🗑️</button>
+                <button class="btn" @click="delPoll(poll)" x-show="isOwnerOrAdmin(poll.createdBy)" style="padding: 4px 8px; font-size: 12px; font-weight: normal; background: transparent; color: var(--coral-400); border: 1px solid transparent;">Xoá</button>
               </div>
             </div>
 
@@ -222,7 +222,11 @@ export function renderVoting() {
             </div>
 
             <div style="margin-top: var(--space-4); font-size: var(--fs-xs); color: var(--text-secondary); display: flex; justify-content: space-between;">
-              <span>Tạo bởi: <span x-text="getMemberName(poll.createdBy)"></span></span>
+              <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <span>Tạo bởi:</span>
+                <div class="avatar" style="width: 20px; height: 20px; font-size: 0.7rem; overflow: hidden;" x-html="window.renderAvatarHtml(getMemberAvatar(poll.createdBy))"></div>
+                <strong style="color: var(--text-primary);" x-text="getMemberName(poll.createdBy)"></strong>
+              </div>
             </div>
             
           </div>

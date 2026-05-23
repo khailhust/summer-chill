@@ -199,7 +199,7 @@ export function renderExpenses() {
 
               <div style="display: flex; align-items: center; gap: var(--space-4);">
                 <div style="font-size: var(--fs-xl); font-weight: bold; color: var(--coral-400);" x-text="formatVND(exp.amount)"></div>
-                <button class="btn-icon" @click="delExpense(exp)" x-show="isOwnerOrAdmin(exp.createdBy)" title="Xoá">🗑️</button>
+                <button class="btn" @click="delExpense(exp)" x-show="isOwnerOrAdmin(exp.createdBy)" style="padding: 4px 8px; font-size: 12px; font-weight: normal; background: transparent; color: var(--coral-400); border: 1px solid transparent;">Xoá</button>
               </div>
 
             </div>

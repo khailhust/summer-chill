@@ -225,12 +225,40 @@
 
 .checklist-content-wrapper {
   flex: 1;
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .checklist-item-text {
-  font-size: var(--fs-lg);
+  font-family: var(--font-body);
+  font-size: var(--fs-xl);
+  font-weight: bold;
   transition: all 0.2s;
   color: var(--text-primary);
+}
+
+.checklist-filter-bar .nav-tab {
+  font-size: var(--fs-base) !important;
+  padding: var(--space-2) var(--space-5) !important;
+}
+
+@media (max-width: 768px) {
+  .checklist-item-text {
+    font-size: var(--fs-lg);
+  }
+}
+
+.checklist-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+}
+
+@media (min-width: 1024px) {
+  .checklist-grid {
+    grid-template-columns: 2fr 1fr;
+  }
 }
 
 .checklist-item-text.is-completed {
