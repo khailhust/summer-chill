@@ -96,31 +96,53 @@
 
 /* Mobile Responsiveness for Dashboard */
 @media (max-width: 768px) {
+  .dashboard-layout {
+    padding-top: 100px; /* Space for taller navbar */
+  }
+
   .dashboard-content {
     padding-bottom: 120px; /* Space for floating music player */
   }
 
   .navbar {
-    padding: 0 var(--space-3);
+    height: auto;
+    padding: var(--space-2) var(--space-3);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    row-gap: var(--space-2);
+    align-items: center;
   }
 
-  /* Hide Logo when in Dashboard on Mobile to save space for tabs */
   .navbar.dashboard-mode .navbar-logo {
-    display: none;
+    display: block; /* Bring back logo */
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 1.5rem;
   }
 
   .navbar-dashboard-content {
-    gap: var(--space-3);
-    width: 100%;
+    display: contents; /* Magic: makes children direct children of .navbar grid */
+  }
+
+  /* Members and Status container */
+  .navbar-dashboard-content > div:last-child {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-end;
   }
 
   .navbar-tabs {
+    grid-column: 1 / -1; /* Span full width */
+    grid-row: 2;
     margin-left: 0 !important;
     overflow-x: auto;
     white-space: nowrap;
     padding-bottom: 4px; /* Space for touch scroll */
     -webkit-overflow-scrolling: touch;
-    flex: 1; /* Allow taking up remaining space */
+    width: 100%;
+    mask-image: linear-gradient(to right, black 90%, transparent 100%); /* Fade out end to indicate scrollable */
+    -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
   }
 
   /* Hide scrollbar for cleaner look */
@@ -131,7 +153,7 @@
 
   .nav-tab {
     padding: var(--space-2) var(--space-3);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 
   .navbar-members {
