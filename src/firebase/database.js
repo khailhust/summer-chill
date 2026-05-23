@@ -106,6 +106,11 @@ export async function deleteChecklistItem(id) {
   await remove(itemRef);
 }
 
+export async function updateChecklistItem(id, updates) {
+  const itemRef = ref(database, `checklist/${id}`);
+  await update(itemRef, updates);
+}
+
 // ==========================================
 // POLLS
 // ==========================================

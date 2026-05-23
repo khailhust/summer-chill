@@ -1,5 +1,6 @@
-import { onChecklistChange, addChecklistItem, toggleChecklistItem, assignChecklistItem, deleteChecklistItem } from "../firebase/database.js";
+import { onChecklistChange, addChecklistItem, updateChecklistItem, toggleChecklistItem, assignChecklistItem, deleteChecklistItem } from "../firebase/database.js";
 import { showToast } from "./toast.js";
+import { openModal } from "./modal.js";
 
 const CATEGORIES = [
   { id: 'food', icon: '🍖', name: 'Thực phẩm', color: 'golden' },
@@ -9,13 +10,72 @@ const CATEGORIES = [
   { id: 'other', icon: '📦', name: 'Khác', color: 'emerald' }
 ];
 
+const renderItemTemplate = (iteratorStr) => `
+  <template x-for="${iteratorStr}" :key="item.id">
+    <div class="glass-card checklist-item-card" :style="item.completed ? 'opacity: 0.6;' : ''">
+      
+      <div class="checklist-row-wrapper" @click="toggle(item)">
+        <div class="checklist-checkbox" 
+             :style="item.completed ? 'background: var(--emerald-400);' : 'background: rgba(52, 211, 153, 0.1);'">
+          <span class="checklist-checkmark" x-show="item.completed">✓</span>
+        </div>
+        
+        <div class="checklist-content-wrapper">
+          <div class="checklist-item-text" :style="item.completed ? 'text-decoration: line-through; color: var(--text-dim);' : 'color: var(--text-primary);'">
+            <span x-text="item.name"></span> 
+            <span class="checklist-quantity" x-show="item.quantity"> (<span x-text="item.quantity"></span>)</span>
+          </div>
+          <div x-show="item.notes" style="font-size: var(--fs-xs); color: var(--text-secondary); margin-top: 2px; line-height: 1.4;">
+            <span style="opacity: 0.7;">📝 </span><span x-text="item.notes"></span>
+          </div>
+          <div x-show="item.completed" style="font-size: var(--fs-xs); color: var(--emerald-400); margin-top: 2px;">
+            ✅ Hoàn thành bởi <span x-text="getMemberName(item.completedBy)"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right actions -->
+      <div style="display: flex; align-items: center; gap: var(--space-4);">
+        
+        <!-- Avatar dropdown for assignment -->
+        <div>
+          <div @click="openAssignModal(item)" style="cursor: pointer; display: flex; align-items: center;" title="Phân công">
+            <div x-show="getAssigneesList(item).length === 0">
+              <button class="btn" style="padding: 4px 8px; font-size: 12px; font-weight: normal; background: rgba(255,255,255,0.05); border: 1px dashed var(--text-dim); border-radius: 4px; color: var(--text-secondary);">
+                👤 Phân công
+              </button>
+            </div>
+            <div x-show="getAssigneesList(item).length > 0" class="navbar-members" style="margin-right: 0; display: flex; align-items: center; flex-wrap: nowrap;">
+              <template x-for="(uid, index) in getAssigneesList(item).slice(0, 3)" :key="uid">
+                <div class="avatar" style="width: 30px; height: 30px; margin-left: -8px;" :style="'z-index: ' + (10 - index) + ';'" x-html="window.renderAvatarHtml(getMemberAvatar(uid))"></div>
+              </template>
+              <div x-show="getAssigneesList(item).length > 3" class="avatar" style="width: 30px; height: 30px; margin-left: -8px; z-index: 1; background: var(--bg-surface); font-size: 0.7rem; border-color: var(--text-dim);">
+                <span x-text="'+' + (getAssigneesList(item).length - 3)"></span>
+              </div>
+              
+              <div style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px dashed var(--text-dim); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text-secondary); flex-shrink: 0; margin-left: 4px; z-index: 0;" title="Phân công thêm">
+                +
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn" @click="openEditModal(item)" style="padding: 4px 8px; font-size: 12px; font-weight: normal; background: transparent; color: var(--sky-400); border: 1px solid transparent;">
+          Sửa
+        </button>
+        <button class="btn" @click="delItem(item)" style="padding: 4px 8px; font-size: 12px; font-weight: normal; background: transparent; color: var(--coral-400); border: 1px solid transparent;">
+          Xoá
+        </button>
+      </div>
+    </div>
+  </template>
+`;
+
 export function renderChecklist() {
   document.addEventListener('alpine:init', () => {
     Alpine.data('checklistComponent', () => ({
       items: [],
-      filter: 'all', // all, pending, completed, mine
-      newItemName: {},
-      newItemQty: {},
+      filter: 'mine', // mine, all, pending, completed
 
       init() {
         onChecklistChange((data) => {
@@ -30,35 +90,126 @@ export function renderChecklist() {
           filtered = filtered.filter(i => !i.completed);
         } else if (this.filter === 'completed') {
           filtered = filtered.filter(i => i.completed);
-        } else if (this.filter === 'mine') {
-          const myUid = Alpine.store('app').user?.uid;
-          filtered = filtered.filter(i => {
-            if (!i.assignedTo) return false;
-            if (typeof i.assignedTo === 'string') return i.assignedTo === myUid;
-            return !!i.assignedTo[myUid];
-          });
         }
         
         return filtered;
       },
 
-      async addItem(categoryId) {
-        const name = this.newItemName[categoryId]?.trim();
-        const qty = this.newItemQty[categoryId]?.trim() || '1';
+      getMyFilteredItems() {
+        const myUid = Alpine.store('app').user?.uid;
+        if (!myUid) return [];
+        let myItems = this.items.filter(i => this.isAssigned(i, myUid));
+        return myItems.sort((a,b) => (a.completed === b.completed) ? 0 : a.completed ? 1 : -1);
+      },
 
-        if (!name) {
-          showToast('Vui lòng nhập tên đồ cần chuẩn bị', 'error');
-          return;
+      openAddModal(categoryId) {
+        const content = `
+          <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+            <div>
+              <label style="display: block; font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: 4px;">Tên đồ cần chuẩn bị / Nhiệm vụ <span style="color: var(--coral-400);">*</span></label>
+              <input type="text" id="chk-title" class="input" style="width: 100%; transition: all 0.2s;" placeholder="Ví dụ: Lều trại, Đồ nướng..." />
+              <div id="chk-title-error" style="color: var(--coral-400); font-size: 12px; margin-top: 4px; display: none;">Vui lòng nhập tên nhiệm vụ</div>
+            </div>
+            
+            <div>
+              <label style="display: block; font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: 4px;">Số lượng (Tuỳ chọn)</label>
+              <input type="text" id="chk-qty" class="input" style="width: 100%;" placeholder="Ví dụ: 2 cái, 3kg..." />
+            </div>
+            
+            <div>
+              <label style="display: block; font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: 4px;">Ghi chú lưu ý (Tuỳ chọn)</label>
+              <textarea id="chk-notes" class="input" style="width: 100%; min-height: 80px; resize: vertical; font-family: inherit;" placeholder="Ví dụ: Nhớ mượn của Quân..."></textarea>
+            </div>
+            
+            <div>
+              <label style="display: block; font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: 4px;">Người phụ trách (Tuỳ chọn)</label>
+              <select id="chk-assignee" class="select" style="width: 100%;">
+                <option value="">-- Chưa phân công --</option>
+                <template x-data x-for="[uid, m] in Object.entries($store.app.members)" :key="uid">
+                  <option :value="uid" x-text="m.name"></option>
+                </template>
+              </select>
+            </div>
+          </div>
+        `;
+
+        openModal('Thêm nhiệm vụ mới', content, async () => {
+          const titleInput = document.getElementById('chk-title');
+          const title = titleInput.value.trim();
+          const qty = document.getElementById('chk-qty').value.trim();
+          const notes = document.getElementById('chk-notes').value.trim();
+          const assigneeUid = document.getElementById('chk-assignee').value;
+          const assignedTo = assigneeUid ? { [assigneeUid]: true } : null;
+
+          if (!title) {
+            document.getElementById('chk-title-error').style.display = 'block';
+            titleInput.style.borderColor = 'var(--coral-400)';
+            return false; // Prevent modal from closing
+          }
+
+          try {
+            const itemData = { name: title, quantity: qty, notes: notes, category: categoryId };
+            if (assignedTo) itemData.assignedTo = assignedTo;
+            await addChecklistItem(itemData);
+            return true; // Close modal
+          } catch (e) {
+            console.error(e);
+            return false;
+          }
+        });
+      },
+
+      openEditModal(item) {
+        const app = Alpine.store('app');
+        if (!app.isAdmin && item.createdBy !== app.user?.uid) {
+           showToast('Chỉ người tạo (hoặc Admin) mới có quyền sửa', 'error');
+           return;
         }
 
-        try {
-          await addChecklistItem({ name, quantity: qty, category: categoryId });
-          this.newItemName[categoryId] = '';
-          this.newItemQty[categoryId] = '';
-          showToast('Đã thêm', 'success');
-        } catch (e) {
-          console.error(e);
-        }
+        const safeName = (item.name || '').replace(/"/g, '&quot;');
+        const safeQty = (item.quantity || '').replace(/"/g, '&quot;');
+        const safeNotes = (item.notes || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        const content = `
+          <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+            <div>
+              <label style="display: block; font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: 4px;">Tên đồ cần chuẩn bị / Nhiệm vụ <span style="color: var(--coral-400);">*</span></label>
+              <input type="text" id="chk-edit-title" class="input" style="width: 100%; transition: all 0.2s;" value="${safeName}" />
+              <div id="chk-edit-title-error" style="color: var(--coral-400); font-size: 12px; margin-top: 4px; display: none;">Vui lòng nhập tên nhiệm vụ</div>
+            </div>
+            
+            <div>
+              <label style="display: block; font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: 4px;">Số lượng (Tuỳ chọn)</label>
+              <input type="text" id="chk-edit-qty" class="input" style="width: 100%;" value="${safeQty}" />
+            </div>
+            
+            <div>
+              <label style="display: block; font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: 4px;">Ghi chú lưu ý (Tuỳ chọn)</label>
+              <textarea id="chk-edit-notes" class="input" style="width: 100%; min-height: 80px; resize: vertical; font-family: inherit;">${safeNotes}</textarea>
+            </div>
+          </div>
+        `;
+
+        openModal('Sửa nhiệm vụ', content, async () => {
+          const titleInput = document.getElementById('chk-edit-title');
+          const title = titleInput.value.trim();
+          const qty = document.getElementById('chk-edit-qty').value.trim();
+          const notes = document.getElementById('chk-edit-notes').value.trim();
+
+          if (!title) {
+            document.getElementById('chk-edit-title-error').style.display = 'block';
+            titleInput.style.borderColor = 'var(--coral-400)';
+            return false;
+          }
+
+          try {
+            await updateChecklistItem(item.id, { name: title, quantity: qty, notes: notes });
+            return true;
+          } catch (e) {
+            console.error(e);
+            return false;
+          }
+        });
       },
 
       async toggle(item) {
@@ -69,24 +220,50 @@ export function renderChecklist() {
         }
       },
 
-      async toggleAssign(item, uid) {
-        let currentAssigned = item.assignedTo || {};
-        if (typeof currentAssigned === 'string') {
-          currentAssigned = { [currentAssigned]: true };
-        }
-        
-        let newAssigned = { ...currentAssigned };
-        if (newAssigned[uid]) {
-          delete newAssigned[uid];
-        } else {
-          newAssigned[uid] = true;
-        }
+      openAssignModal(item) {
+        const members = Alpine.store('app').members || {};
+        let memberHtml = Object.entries(members).map(([uid, m]) => {
+          const isAssigned = this.isAssigned(item, uid);
+          return `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) 0; border-bottom: 1px solid var(--border-glass);">
+              <div style="display: flex; align-items: center; gap: var(--space-3);">
+                <div class="avatar" style="width: 32px; height: 32px; font-size: 16px; overflow: hidden;">
+                  <div style="width: 100%; height: 100%; border-radius: 50%;">${window.renderAvatarHtml ? window.renderAvatarHtml(m.avatar) : '👤'}</div>
+                </div>
+                <span style="color: var(--text-primary);">${m.name}</span>
+              </div>
+              <input type="checkbox" class="assign-checkbox" value="${uid}" ${isAssigned ? 'checked' : ''} style="width: 20px; height: 20px; accent-color: var(--emerald-400);" />
+            </div>
+          `;
+        }).join('');
 
-        try {
-          await assignChecklistItem(item.id, newAssigned);
-        } catch (e) {
-          console.error(e);
-        }
+        const content = `
+          <div style="display: flex; flex-direction: column; max-height: 50vh; overflow-y: auto;">
+            ${memberHtml}
+          </div>
+        `;
+
+        openModal(`Phân công: ${item.name}`, content, async () => {
+          const checkboxes = document.querySelectorAll('.assign-checkbox');
+          let newAssigned = {};
+          checkboxes.forEach(cb => {
+            if (cb.checked) {
+              newAssigned[cb.value] = true;
+            }
+          });
+
+          if (Object.keys(newAssigned).length === 0) {
+            newAssigned = null;
+          }
+
+          try {
+            await assignChecklistItem(item.id, newAssigned);
+            return true;
+          } catch (e) {
+            console.error(e);
+            return false;
+          }
+        });
       },
 
       isAssigned(item, uid) {
@@ -127,6 +304,20 @@ export function renderChecklist() {
         if (this.totalItems === 0) return 0;
         return Math.round((this.completedItems / this.totalItems) * 100);
       },
+      get myTotalItems() { 
+         const myUid = Alpine.store('app').user?.uid;
+         if (!myUid) return 0;
+         return this.items.filter(i => this.isAssigned(i, myUid)).length; 
+      },
+      get myCompletedItems() { 
+         const myUid = Alpine.store('app').user?.uid;
+         if (!myUid) return 0;
+         return this.items.filter(i => this.isAssigned(i, myUid) && i.completed).length; 
+      },
+      get myProgressPercent() {
+        if (this.myTotalItems === 0) return 0;
+        return Math.round((this.myCompletedItems / this.myTotalItems) * 100);
+      },
       get memberStats() {
         const stats = {};
         const members = Alpine.store('app').members || {};
@@ -159,92 +350,45 @@ export function renderChecklist() {
   return `
     <div x-data="checklistComponent" style="display: grid; grid-template-columns: 1fr; gap: var(--space-8); @media(min-width: 1024px) { grid-template-columns: 2fr 1fr; }">
       
-      <!-- Left Panel: Checklist -->
       <div>
         <div class="checklist-filter-bar" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-6); overflow-x: auto; padding-bottom: var(--space-2);">
+          <button class="nav-tab" :class="filter === 'mine' ? 'active' : ''" @click="filter = 'mine'" style="font-weight: bold; flex-shrink: 0;" :style="filter === 'mine' ? '' : 'color: var(--golden-400); border-color: var(--golden-400);'">🎯 Phần mình lo</button>
           <button class="nav-tab" :class="filter === 'all' ? 'active' : ''" @click="filter = 'all'">Tất cả</button>
           <button class="nav-tab" :class="filter === 'pending' ? 'active' : ''" @click="filter = 'pending'">Chưa xong</button>
           <button class="nav-tab" :class="filter === 'completed' ? 'active' : ''" @click="filter = 'completed'">Đã xong</button>
-          <button class="nav-tab" :class="filter === 'mine' ? 'active' : ''" @click="filter = 'mine'">Của tôi</button>
         </div>
 
-        ${CATEGORIES.map(cat => `
-          <div style="margin-bottom: var(--space-8);">
-            <div class="badge ${cat.color}" style="font-size: var(--fs-lg); margin-bottom: var(--space-4); padding: var(--space-2) var(--space-4);">
-              ${cat.icon} ${cat.name}
-            </div>
-
-            <!-- List items -->
-            <div style="display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-4);">
-              <template x-for="item in getItems('${cat.id}')" :key="item.id">
-                <div class="glass-card" style="padding: var(--space-2) var(--space-4); display: flex; align-items: center; justify-content: space-between; transition: all 0.2s;" :style="item.completed ? 'opacity: 0.6;' : ''">
-                  
-                  <div style="display: flex; align-items: center; gap: var(--space-4); flex: 1;">
-                    <div style="width: 24px; height: 24px; border-radius: 4px; border: 2px solid var(--emerald-400); display: flex; align-items: center; justify-content: center; cursor: pointer;" 
-                         :style="item.completed ? 'background: var(--emerald-400);' : ''"
-                         @click="toggle(item)">
-                      <span x-show="item.completed" style="color: var(--bg-deep); font-size: 14px;">✓</span>
-                    </div>
-                    
-                    <div style="flex: 1;">
-                      <div style="font-size: var(--fs-lg);" :style="item.completed ? 'text-decoration: line-through; color: var(--text-dim);' : ''">
-                        <span x-text="item.name"></span> 
-                        <span style="color: var(--text-secondary); font-size: var(--fs-sm);" x-show="item.quantity"> (x<span x-text="item.quantity"></span>)</span>
-                      </div>
-                      <div x-show="item.completed" style="font-size: var(--fs-xs); color: var(--emerald-400);">
-                        ✅ Hoàn thành bởi <span x-text="getMemberName(item.completedBy)"></span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Right actions -->
-                  <div style="display: flex; align-items: center; gap: var(--space-4);">
-                    
-                    <!-- Avatar dropdown for assignment -->
-                    <div style="position: relative;" x-data="{ open: false }">
-                      <div @click="open = !open" style="cursor: pointer; display: flex; align-items: center;" title="Phân công">
-                        <div x-show="getAssigneesList(item).length === 0" class="avatar" style="width: 30px; height: 30px; border-style: dashed; border-color: var(--text-dim);">
-                          <span style="color: var(--text-dim);">?</span>
-                        </div>
-                        <div x-show="getAssigneesList(item).length > 0" class="navbar-members" style="margin-right: 0;">
-                          <template x-for="(uid, index) in getAssigneesList(item).slice(0, 3)" :key="uid">
-                            <div class="avatar" style="width: 30px; height: 30px; margin-left: -8px;" :style="'z-index: ' + (10 - index) + ';'" x-html="window.renderAvatarHtml(getMemberAvatar(uid))"></div>
-                          </template>
-                          <div x-show="getAssigneesList(item).length > 3" class="avatar" style="width: 30px; height: 30px; margin-left: -8px; z-index: 1; background: var(--bg-surface); font-size: 0.7rem; border-color: var(--text-dim);">
-                            <span x-text="'+' + (getAssigneesList(item).length - 3)"></span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <!-- Dropdown menu -->
-                      <div x-show="open" @click.outside="open = false" class="assign-dropdown" style="display:none;">
-                        <div style="font-size: var(--fs-xs); color: var(--text-secondary); padding: 4px; display: flex; justify-content: space-between; align-items: center;">
-                          <span>Phân công cho (chọn nhiều):</span>
-                        </div>
-                        <template x-for="uid in Object.keys($store.app.members)" :key="uid">
-                          <button class="btn" style="justify-content: flex-start; padding: 6px 8px; width: 100%; transition: none;" :style="isAssigned(item, uid) ? 'background: rgba(52, 211, 153, 0.1); border-left: 2px solid var(--emerald-400);' : ''" @click.stop="toggleAssign(item, uid)">
-                            <div style="width: 24px; height: 24px; display: inline-block; overflow: hidden; border-radius: 50%; vertical-align: middle; margin-right: 8px; flex-shrink: 0;" x-html="window.renderAvatarHtml($store.app.members[uid].avatar)"></div>
-                            <span x-text="$store.app.members[uid].name" style="flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
-                            <span x-show="isAssigned(item, uid)" style="color: var(--emerald-400);">✓</span>
-                          </button>
-                        </template>
-                      </div>
-                    </div>
-
-                    <button class="btn-icon" @click="delItem(item)" title="Xoá">🗑️</button>
-                  </div>
-                </div>
-              </template>
-            </div>
-
-            <!-- Add new item -->
-            <div class="checklist-add-form" style="display: flex; gap: var(--space-2);">
-              <input type="text" class="input" placeholder="Thêm đồ cần chuẩn bị..." x-model="newItemName['${cat.id}']" @keydown.enter="addItem('${cat.id}')" style="flex: 2;" />
-              <input type="text" class="input" placeholder="SL (VD: 2kg)" x-model="newItemQty['${cat.id}']" @keydown.enter="addItem('${cat.id}')" style="flex: 1;" />
-              <button class="btn btn-primary" @click="addItem('${cat.id}')">Thêm</button>
+        <!-- Flat view for 'mine' -->
+        <div x-show="filter === 'mine'">
+          <div style="display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-4);">
+            ${renderItemTemplate("item in getMyFilteredItems()")}
+            
+            <div x-show="getMyFilteredItems().length === 0" style="text-align: center; color: var(--text-dim); padding: var(--space-8); font-style: italic;">
+              Bạn chưa có nhiệm vụ nào được phân công.
             </div>
           </div>
-        `).join('')}
+        </div>
+
+        <!-- Categorized view for other filters -->
+        <div x-show="filter !== 'mine'" style="display: none;">
+          ${CATEGORIES.map(cat => `
+            <div style="margin-bottom: var(--space-8);" x-show="getItems('${cat.id}').length > 0 || filter === 'all'">
+              <div class="badge ${cat.color}" style="font-size: var(--fs-lg); margin-bottom: var(--space-4); padding: var(--space-2) var(--space-4);">
+                ${cat.icon} ${cat.name}
+              </div>
+
+              <!-- List items -->
+              <div style="display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-4);">
+                ${renderItemTemplate(`item in getItems('${cat.id}')`)}
+              </div>
+
+              <!-- Add new item Button -->
+              <button class="btn" x-show="filter === 'all' || filter === 'pending'" style="width: 100%; border: 1px dashed var(--border-glass); background: rgba(255,255,255,0.02); color: var(--text-secondary); justify-content: center; padding: 10px;" @click="openAddModal('${cat.id}')">
+                + Thêm mục mới
+              </button>
+            </div>
+          `).join('')}
+        </div>
 
       </div>
 
@@ -254,22 +398,45 @@ export function renderChecklist() {
           <h3 style="margin-bottom: var(--space-4); color: var(--golden-400);">Tiến độ chuẩn bị</h3>
           
           <!-- Circular Progress -->
-          <div style="position: relative; width: 150px; height: 150px; margin: 0 auto var(--space-4) auto;">
-            <svg width="150" height="150" viewBox="0 0 150 150" style="transform: rotate(-90deg);">
-              <circle cx="75" cy="75" r="65" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12" />
-              <circle cx="75" cy="75" r="65" fill="none" stroke="var(--emerald-400)" stroke-width="12" 
-                      stroke-dasharray="408.4" 
-                      :stroke-dashoffset="408.4 - (408.4 * progressPercent) / 100" 
-                      style="transition: stroke-dashoffset 1s ease-out;" />
-            </svg>
-            <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-              <span style="font-size: var(--fs-3xl); font-weight: bold; font-family: var(--font-heading);" x-text="progressPercent + '%'"></span>
+          <div style="display: flex; justify-content: center; gap: var(--space-6); margin-bottom: var(--space-4);">
+            
+            <!-- My Progress -->
+            <div style="text-align: center;" x-show="myTotalItems > 0">
+              <div style="position: relative; width: 100px; height: 100px; margin: 0 auto var(--space-2) auto;">
+                <svg width="100" height="100" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="var(--golden-400)" stroke-width="8" 
+                          stroke-dasharray="263.89" 
+                          :stroke-dashoffset="263.89 - (263.89 * myProgressPercent) / 100" 
+                          style="transition: stroke-dashoffset 1s ease-out;" />
+                </svg>
+                <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                  <span style="font-size: var(--fs-xl); font-weight: bold; font-family: var(--font-heading); color: var(--golden-400);" x-text="myProgressPercent + '%'"></span>
+                </div>
+              </div>
+              <div style="font-size: var(--fs-sm); font-weight: bold; color: var(--golden-400);">Của tôi</div>
+              <div style="font-size: var(--fs-xs); color: var(--text-dim);"><span x-text="myCompletedItems"></span> / <span x-text="myTotalItems"></span> xong</div>
             </div>
-          </div>
 
-          <p style="color: var(--text-secondary);">
-            <span x-text="completedItems"></span> / <span x-text="totalItems"></span> mục đã xong
-          </p>
+            <!-- Overall Progress -->
+            <div style="text-align: center;">
+              <div style="position: relative; width: 100px; height: 100px; margin: 0 auto var(--space-2) auto;">
+                <svg width="100" height="100" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="var(--emerald-400)" stroke-width="8" 
+                          stroke-dasharray="263.89" 
+                          :stroke-dashoffset="263.89 - (263.89 * progressPercent) / 100" 
+                          style="transition: stroke-dashoffset 1s ease-out;" />
+                </svg>
+                <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                  <span style="font-size: var(--fs-xl); font-weight: bold; font-family: var(--font-heading); color: var(--emerald-400);" x-text="progressPercent + '%'"></span>
+                </div>
+              </div>
+              <div style="font-size: var(--fs-sm); font-weight: bold; color: var(--emerald-400);">Chung</div>
+              <div style="font-size: var(--fs-xs); color: var(--text-dim);"><span x-text="completedItems"></span> / <span x-text="totalItems"></span> xong</div>
+            </div>
+
+          </div>
         </div>
 
         <div class="glass-card">
@@ -298,7 +465,7 @@ export function renderChecklist() {
           </div>
         </div>
       </div>
-
+      
     </div>
   `;
 }
