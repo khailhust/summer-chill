@@ -115,9 +115,10 @@
     align-items: center;
   }
 
-  /* Hide the top-right CTA on mobile landing page to reduce clutter */
-  .navbar.landing-mode > div {
-    display: none !important;
+  /* Thay vì ẩn nút CTA trên landing page, ta sẽ làm nó nhỏ lại một chút để không bị chật */
+  .navbar.landing-mode .btn {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.85rem;
   }
 
   .navbar.dashboard-mode .navbar-logo {
