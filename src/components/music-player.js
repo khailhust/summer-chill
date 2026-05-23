@@ -5,6 +5,7 @@ export function renderMusicPlayer() {
     Alpine.data('musicPlayer', () => ({
       isPlaying: false,
       hasInteracted: false,
+      wasPlayingBeforeDashboard: true, // Lưu trạng thái để phục hồi khi quay lại Landing
       audioUrl: MUSIC_URL,
       
       init() {
@@ -12,18 +13,43 @@ export function renderMusicPlayer() {
         this.audio.loop = true;
         this.audio.volume = 0.4; // Đặt âm lượng vừa phải
 
+        // Lắng nghe thay đổi trang để tự động Play / Pause
+        this.$watch('$store.app.isDashboard', (isDashboard) => {
+          if (isDashboard) {
+            // Khi vào Dashboard: Lưu trạng thái hiện tại và tạm dừng
+            this.wasPlayingBeforeDashboard = this.isPlaying;
+            if (this.isPlaying) {
+              this.pause();
+            }
+          } else {
+            // Khi quay lại Landing: Phát lại từ đầu nếu trước đó đang phát
+            if (this.wasPlayingBeforeDashboard && this.hasInteracted) {
+              this.audio.currentTime = 0; // Reset về đầu bài hát
+              this.play();
+            }
+          }
+        });
+
         // Tự động phát khi người dùng tương tác lần đầu với trang
         const playOnInteract = () => {
           if (!this.hasInteracted) {
-            this.audio.play().then(() => {
-              this.isPlaying = true;
+            // Chỉ tự động phát nếu đang ở Landing Page
+            if (!this.$store.app.isDashboard) {
+              this.audio.play().then(() => {
+                this.isPlaying = true;
+                this.hasInteracted = true;
+                // Chỉ xoá sự kiện khi đã phát thành công
+                document.removeEventListener('click', playOnInteract);
+                document.removeEventListener('touchend', playOnInteract);
+              }).catch(e => {
+                console.warn("Autoplay chưa sẵn sàng, đợi thao tác click tiếp theo.", e);
+              });
+            } else {
+              // Tương tác lần đầu ở Dashboard thì không phát, nhưng ghi nhận đã tương tác
               this.hasInteracted = true;
-              // Chỉ xoá sự kiện khi đã phát thành công
               document.removeEventListener('click', playOnInteract);
               document.removeEventListener('touchend', playOnInteract);
-            }).catch(e => {
-              console.warn("Autoplay chưa sẵn sàng, đợi thao tác click tiếp theo.", e);
-            });
+            }
           }
         };
 
