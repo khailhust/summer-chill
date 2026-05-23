@@ -96,9 +96,9 @@ export async function toggleChecklistItem(id, currentStatus) {
   });
 }
 
-export async function assignChecklistItem(id, memberId) {
+export async function assignChecklistItem(id, assignees) {
   const itemRef = ref(database, `checklist/${id}`);
-  await update(itemRef, { assignedTo: memberId });
+  await update(itemRef, { assignedTo: assignees });
 }
 
 export async function deleteChecklistItem(id) {

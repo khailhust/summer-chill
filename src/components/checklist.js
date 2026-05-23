@@ -32,7 +32,11 @@ export function renderChecklist() {
           filtered = filtered.filter(i => i.completed);
         } else if (this.filter === 'mine') {
           const myUid = Alpine.store('app').user?.uid;
-          filtered = filtered.filter(i => i.assignedTo === myUid);
+          filtered = filtered.filter(i => {
+            if (!i.assignedTo) return false;
+            if (typeof i.assignedTo === 'string') return i.assignedTo === myUid;
+            return !!i.assignedTo[myUid];
+          });
         }
         
         return filtered;
@@ -65,13 +69,36 @@ export function renderChecklist() {
         }
       },
 
-      async assign(item, memberId) {
+      async toggleAssign(item, uid) {
+        let currentAssigned = item.assignedTo || {};
+        if (typeof currentAssigned === 'string') {
+          currentAssigned = { [currentAssigned]: true };
+        }
+        
+        let newAssigned = { ...currentAssigned };
+        if (newAssigned[uid]) {
+          delete newAssigned[uid];
+        } else {
+          newAssigned[uid] = true;
+        }
+
         try {
-          await assignChecklistItem(item.id, memberId);
-          showToast('Đã phân công', 'success');
+          await assignChecklistItem(item.id, newAssigned);
         } catch (e) {
           console.error(e);
         }
+      },
+
+      isAssigned(item, uid) {
+        if (!item.assignedTo) return false;
+        if (typeof item.assignedTo === 'string') return item.assignedTo === uid;
+        return !!item.assignedTo[uid];
+      },
+
+      getAssigneesList(item) {
+        if (!item.assignedTo) return [];
+        if (typeof item.assignedTo === 'string') return [item.assignedTo];
+        return Object.keys(item.assignedTo);
       },
 
       async delItem(item) {
@@ -110,9 +137,17 @@ export function renderChecklist() {
         });
 
         this.items.forEach(i => {
-          if (i.assignedTo && stats[i.assignedTo]) {
-            stats[i.assignedTo].total++;
-            if (i.completed) stats[i.assignedTo].completed++;
+          if (i.assignedTo) {
+            let uids = [];
+            if (typeof i.assignedTo === 'string') uids = [i.assignedTo];
+            else uids = Object.keys(i.assignedTo);
+
+            uids.forEach(uid => {
+              if (stats[uid]) {
+                stats[uid].total++;
+                if (i.completed) stats[uid].completed++;
+              }
+            });
           }
         });
 
@@ -167,23 +202,32 @@ export function renderChecklist() {
                     
                     <!-- Avatar dropdown for assignment -->
                     <div style="position: relative;" x-data="{ open: false }">
-                      <div class="avatar" style="width: 30px; height: 30px; cursor: pointer; overflow: hidden;" @click="open = !open" :title="item.assignedTo ? 'Được phân công cho: ' + getMemberName(item.assignedTo) : 'Phân công'">
-                        <span x-show="!item.assignedTo" style="color: var(--text-dim);">?</span>
-                        <div style="width: 100%; height: 100%;" x-show="item.assignedTo" x-html="window.renderAvatarHtml(getMemberAvatar(item.assignedTo))"></div>
+                      <div @click="open = !open" style="cursor: pointer; display: flex; align-items: center;" title="Phân công">
+                        <div x-show="getAssigneesList(item).length === 0" class="avatar" style="width: 30px; height: 30px; border-style: dashed; border-color: var(--text-dim);">
+                          <span style="color: var(--text-dim);">?</span>
+                        </div>
+                        <div x-show="getAssigneesList(item).length > 0" class="navbar-members" style="margin-right: 0;">
+                          <template x-for="(uid, index) in getAssigneesList(item).slice(0, 3)" :key="uid">
+                            <div class="avatar" style="width: 30px; height: 30px; margin-left: -8px;" :style="'z-index: ' + (10 - index) + ';'" x-html="window.renderAvatarHtml(getMemberAvatar(uid))"></div>
+                          </template>
+                          <div x-show="getAssigneesList(item).length > 3" class="avatar" style="width: 30px; height: 30px; margin-left: -8px; z-index: 1; background: var(--bg-surface); font-size: 0.7rem; border-color: var(--text-dim);">
+                            <span x-text="'+' + (getAssigneesList(item).length - 3)"></span>
+                          </div>
+                        </div>
                       </div>
                       
                       <!-- Dropdown menu -->
-                      <div x-show="open" @click.outside="open = false" style="position: absolute; right: 0; top: 100%; margin-top: 5px; background: var(--bg-surface); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: var(--space-2); z-index: 10; display: flex; flex-direction: column; gap: var(--space-2); min-width: 150px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);" style="display:none;">
-                        <div style="font-size: var(--fs-xs); color: var(--text-secondary); padding: 4px;">Phân công cho:</div>
+                      <div x-show="open" @click.outside="open = false" style="position: absolute; right: 0; top: 100%; margin-top: 5px; background: var(--bg-surface); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: var(--space-2); z-index: 50; display: flex; flex-direction: column; gap: var(--space-2); width: 220px; max-width: 85vw; box-shadow: 0 4px 12px rgba(0,0,0,0.5); max-height: 300px; overflow-y: auto;" style="display:none;">
+                        <div style="font-size: var(--fs-xs); color: var(--text-secondary); padding: 4px; display: flex; justify-content: space-between; align-items: center;">
+                          <span>Phân công cho (chọn nhiều):</span>
+                        </div>
                         <template x-for="uid in Object.keys($store.app.members)" :key="uid">
-                          <button class="btn" style="justify-content: flex-start; padding: 4px 8px; width: 100%;" :style="item.assignedTo === uid ? 'background: rgba(255,255,255,0.1);' : ''" @click="assign(item, uid); open = false">
-                            <div style="width: 24px; height: 24px; display: inline-block; overflow: hidden; border-radius: 50%; vertical-align: middle; margin-right: 8px;" x-html="window.renderAvatarHtml($store.app.members[uid].avatar)"></div>
-                            <span x-text="$store.app.members[uid].name"></span>
+                          <button class="btn" style="justify-content: flex-start; padding: 6px 8px; width: 100%; transition: none;" :style="isAssigned(item, uid) ? 'background: rgba(52, 211, 153, 0.1); border-left: 2px solid var(--emerald-400);' : ''" @click.stop="toggleAssign(item, uid)">
+                            <div style="width: 24px; height: 24px; display: inline-block; overflow: hidden; border-radius: 50%; vertical-align: middle; margin-right: 8px; flex-shrink: 0;" x-html="window.renderAvatarHtml($store.app.members[uid].avatar)"></div>
+                            <span x-text="$store.app.members[uid].name" style="flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+                            <span x-show="isAssigned(item, uid)" style="color: var(--emerald-400);">✓</span>
                           </button>
                         </template>
-                        <button class="btn" style="justify-content: flex-start; padding: 4px 8px; width: 100%; color: var(--coral-400);" @click="assign(item, null); open = false" x-show="item.assignedTo">
-                          Bỏ phân công
-                        </button>
                       </div>
                     </div>
 
