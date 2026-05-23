@@ -1,4 +1,4 @@
-import { onPollsChange, addPoll, votePoll, deletePoll } from "../firebase/database.js";
+import { onPollsChange, addPoll, votePoll, deletePoll, addPollOption } from "../firebase/database.js";
 import { openModal, closeModal } from "./modal.js";
 import { showToast } from "./toast.js";
 
@@ -67,6 +67,28 @@ export function renderVoting() {
           }
         } catch (e) {
           console.error(e);
+        }
+      },
+
+      async addCustomOption(poll) {
+        if (!poll.newOptionText) return;
+        const text = poll.newOptionText.trim();
+        if (!text) return;
+        
+        if (poll.options.includes(text)) {
+          showToast('Lựa chọn này đã tồn tại', 'error');
+          return;
+        }
+
+        try {
+          const newIndex = poll.options.length;
+          const { addPollOption } = await import('../firebase/database.js');
+          await addPollOption(poll.id, newIndex, text);
+          poll.newOptionText = ''; // Clear input
+          showToast('Đã thêm lựa chọn mới', 'success');
+        } catch (e) {
+          console.error(e);
+          showToast('Lỗi khi thêm lựa chọn', 'error');
         }
       },
 
@@ -219,6 +241,12 @@ export function renderVoting() {
                 </div>
 
               </template>
+            </div>
+
+            <!-- Add custom option -->
+            <div x-show="poll.status === 'open'" style="display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4);">
+              <input type="text" class="input" style="flex: 1; min-width: 200px; padding: 8px 12px; font-size: var(--fs-sm); background: rgba(255,255,255,0.02); border: 1px dashed var(--border-glass);" placeholder="Thêm lựa chọn khác..." x-model="poll.newOptionText" @keydown.enter="addCustomOption(poll)">
+              <button class="btn" style="padding: 8px 16px; font-size: var(--fs-sm); font-weight: bold; background: rgba(52, 211, 153, 0.15); color: var(--emerald-400); border: 1px solid var(--emerald-400);" @click="addCustomOption(poll)" x-show="poll.newOptionText && poll.newOptionText.trim().length > 0">Thêm</button>
             </div>
 
             <div style="margin-top: var(--space-4); font-size: var(--fs-xs); color: var(--text-secondary); display: flex; justify-content: space-between;">

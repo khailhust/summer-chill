@@ -141,6 +141,11 @@ export async function deletePoll(id) {
   await remove(pollRef);
 }
 
+export async function addPollOption(pollId, newOptionIndex, newOptionText) {
+  const optionRef = ref(database, `polls/${pollId}/options/${newOptionIndex}`);
+  await set(optionRef, newOptionText);
+}
+
 export async function votePoll(pollId, optionKey, allowMultiple, pollOptionsCount) {
   if (!auth.currentUser) return;
   const uid = auth.currentUser.uid;

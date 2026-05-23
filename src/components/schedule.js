@@ -278,7 +278,7 @@ export function renderSchedule() {
         
         <!-- Ngày 1 -->
         <div>
-          <div class="badge emerald" style="font-size: var(--fs-lg); margin-bottom: var(--space-6); padding: var(--space-2) var(--space-6);">Ngày 1 (30/05)</div>
+          <div class="badge emerald" style="font-family: var(--font-heading); font-weight: bold; font-size: var(--fs-lg); margin-bottom: var(--space-6); padding: var(--space-2) var(--space-6);">Ngày 1 (30/05)</div>
           
           <div style="position: relative;">
             <template x-for="item in day1Items" :key="item.id">
@@ -301,7 +301,7 @@ export function renderSchedule() {
                 <div style="flex: 1; padding-bottom: var(--space-6);">
                   <div class="glass-card" style="padding: var(--space-4); margin-bottom: 0;" :style="\`border-left: 4px solid var(--\${getCategoryColor(item.category)}-400);\`">
                     <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
-                      <h3 style="font-size: var(--fs-lg); margin-bottom: 0;" x-text="item.title"></h3>
+                      <h3 style="font-size: var(--fs-lg); margin-bottom: 0; font-family: var(--font-body);" x-text="item.title"></h3>
                       <div class="badge" :class="getCategoryColor(item.category)" x-text="getCategoryName(item.category)"></div>
                     </div>
                     
@@ -331,7 +331,7 @@ export function renderSchedule() {
 
         <!-- Ngày 2 -->
         <div>
-          <div class="badge sky" style="font-size: var(--fs-lg); margin-bottom: var(--space-6); padding: var(--space-2) var(--space-6);">Ngày 2 (31/05)</div>
+          <div class="badge sky" style="font-family: var(--font-heading); font-weight: bold; font-size: var(--fs-lg); margin-bottom: var(--space-6); padding: var(--space-2) var(--space-6);">Ngày 2 (31/05)</div>
           
           <div style="position: relative;">
             <template x-for="item in day2Items" :key="item.id">
@@ -354,7 +354,7 @@ export function renderSchedule() {
                 <div style="flex: 1; padding-bottom: var(--space-6);">
                   <div class="glass-card" style="padding: var(--space-4); margin-bottom: 0;" :style="\`border-left: 4px solid var(--\${getCategoryColor(item.category)}-400);\`">
                     <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
-                      <h3 style="font-size: var(--fs-lg); margin-bottom: 0;" x-text="item.title"></h3>
+                      <h3 style="font-size: var(--fs-lg); margin-bottom: 0; font-family: var(--font-body);" x-text="item.title"></h3>
                       <div class="badge" :class="getCategoryColor(item.category)" x-text="getCategoryName(item.category)"></div>
                     </div>
                     
