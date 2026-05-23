@@ -217,7 +217,7 @@ export function renderChecklist() {
                       </div>
                       
                       <!-- Dropdown menu -->
-                      <div x-show="open" @click.outside="open = false" style="position: absolute; right: 0; top: 100%; margin-top: 5px; background: var(--bg-surface); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: var(--space-2); z-index: 50; display: flex; flex-direction: column; gap: var(--space-2); width: 220px; max-width: 85vw; box-shadow: 0 4px 12px rgba(0,0,0,0.5); max-height: 300px; overflow-y: auto;" style="display:none;">
+                      <div x-show="open" @click.outside="open = false" class="assign-dropdown" style="display:none;">
                         <div style="font-size: var(--fs-xs); color: var(--text-secondary); padding: 4px; display: flex; justify-content: space-between; align-items: center;">
                           <span>Phân công cho (chọn nhiều):</span>
                         </div>
