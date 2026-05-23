@@ -16,10 +16,22 @@ export function renderNavbar() {
         
         <!-- Tabs -->
         <div class="navbar-tabs" style="margin-left: var(--space-10);">
-          <a href="#/dashboard/schedule" class="nav-tab" :class="$store.app.route.includes('schedule') || $store.app.route === '#/dashboard' ? 'active' : ''">📅 Lịch trình</a>
-          <a href="#/dashboard/checklist" class="nav-tab" :class="$store.app.route.includes('checklist') ? 'active' : ''">✅ Chuẩn bị</a>
-          <a href="#/dashboard/polls" class="nav-tab" :class="$store.app.route.includes('polls') ? 'active' : ''">🗳️ Bình chọn</a>
-          <a href="#/dashboard/expenses" class="nav-tab" :class="$store.app.route.includes('expenses') ? 'active' : ''">💰 Chi phí</a>
+          <a href="#/dashboard/schedule" class="nav-tab" style="display: flex; align-items: center; gap: 6px;" :class="$store.app.route.includes('schedule') || $store.app.route === '#/dashboard' ? 'active' : ''">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Lịch trình
+          </a>
+          <a href="#/dashboard/checklist" class="nav-tab" style="display: flex; align-items: center; gap: 6px;" :class="$store.app.route.includes('checklist') ? 'active' : ''">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            Chuẩn bị
+          </a>
+          <a href="#/dashboard/polls" class="nav-tab" style="display: flex; align-items: center; gap: 6px;" :class="$store.app.route.includes('polls') ? 'active' : ''">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            Bình chọn
+          </a>
+          <a href="#/dashboard/expenses" class="nav-tab" style="display: flex; align-items: center; gap: 6px;" :class="$store.app.route.includes('expenses') ? 'active' : ''">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
+            Chi phí
+          </a>
         </div>
 
         <!-- Right Side: Status + Members -->

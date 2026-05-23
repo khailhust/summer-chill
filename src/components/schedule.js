@@ -280,29 +280,44 @@ export function renderSchedule() {
         <div>
           <div class="badge emerald" style="font-size: var(--fs-lg); margin-bottom: var(--space-6); padding: var(--space-2) var(--space-6);">Ngày 1 (30/05)</div>
           
-          <div style="position: relative; padding-left: var(--space-4); border-left: 2px dashed rgba(52, 211, 153, 0.3);">
+          <div style="position: relative;">
             <template x-for="item in day1Items" :key="item.id">
-              <div class="glass-card animate-fade-in" style="margin-bottom: var(--space-4); position: relative; padding: var(--space-4);" :style="\`border-left: 4px solid var(--\${getCategoryColor(item.category)}-400);\`">
-                <div style="position: absolute; left: -21px; top: 20px; width: 12px; height: 12px; border-radius: 50%;" :style="\`background: var(--\${getCategoryColor(item.category)}-400); box-shadow: 0 0 10px var(--\${getCategoryColor(item.category)}-400);\`"></div>
-                
-                <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
-                  <div style="font-weight: bold; color: var(--emerald-400); font-family: var(--font-heading); font-size: var(--fs-xl);">
-                    <span x-text="item.startTime"></span> <span x-show="item.endTime" style="color: var(--text-secondary); font-size: var(--fs-sm); font-family: var(--font-body);"> - <span x-text="item.endTime"></span></span>
-                  </div>
-                  <div class="badge" :class="getCategoryColor(item.category)" x-text="getCategoryName(item.category)"></div>
+              <div class="animate-fade-in" style="display: flex; gap: var(--space-4); margin-bottom: 0; position: relative; min-height: 100px;">
+                <!-- Cột thời gian bên trái -->
+                <div style="width: 70px; flex-shrink: 0; text-align: right; padding-top: 6px;">
+                  <div style="font-weight: bold; font-family: var(--font-heading); font-size: var(--fs-xl); color: var(--emerald-400);" x-text="item.startTime"></div>
+                  <div x-show="item.endTime" style="color: var(--text-secondary); font-size: var(--fs-sm); margin-top: 2px;" x-text="item.endTime"></div>
                 </div>
 
-                <h3 style="font-size: var(--fs-lg); margin-bottom: var(--space-1);" x-text="item.title"></h3>
-                <p style="color: var(--text-secondary); font-size: var(--fs-sm); margin-bottom: var(--space-4);" x-show="item.desc" x-text="item.desc"></p>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: var(--space-2);">
-                  <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); color: var(--text-secondary);">
-                    <div class="avatar" style="width: 24px; height: 24px; font-size: 0.8rem; overflow: hidden;" x-html="window.renderAvatarHtml(getMemberAvatar(item.createdBy))"></div>
-                    <span x-text="getMemberName(item.createdBy)"></span>
+                <!-- Trục thời gian ở giữa -->
+                <div style="position: relative; width: 2px; background: rgba(52, 211, 153, 0.2); display: flex; justify-content: center;">
+                  <!-- Dấu chấm tròn -->
+                  <div style="position: absolute; top: 12px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bg-deep);" 
+                       :style="\`background: var(--\${getCategoryColor(item.category)}-400); box-shadow: 0 0 10px var(--\${getCategoryColor(item.category)}-400);\`">
                   </div>
-                  <div style="display: flex; gap: var(--space-2);" x-show="isOwnerOrAdmin(item.createdBy)">
-                    <button class="btn-icon" @click="openEditModal(item)" title="Sửa" style="padding: 4px;">✏️</button>
-                    <button class="btn-icon" @click="deleteItem(item)" title="Xoá" style="padding: 4px;">🗑️</button>
+                </div>
+
+                <!-- Cột nội dung bên phải -->
+                <div style="flex: 1; padding-bottom: var(--space-6);">
+                  <div class="glass-card" style="padding: var(--space-4); margin-bottom: 0;" :style="\`border-left: 4px solid var(--\${getCategoryColor(item.category)}-400);\`">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                      <h3 style="font-size: var(--fs-lg); margin-bottom: 0;" x-text="item.title"></h3>
+                      <div class="badge" :class="getCategoryColor(item.category)" x-text="getCategoryName(item.category)"></div>
+                    </div>
+                    
+                    <p style="color: var(--text-secondary); font-size: var(--fs-sm); margin-bottom: var(--space-4);" x-show="item.desc" x-text="item.desc"></p>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: var(--space-2);">
+                      <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); color: var(--text-secondary);">
+                        <span>Người tạo:</span>
+                        <div class="avatar" style="width: 24px; height: 24px; font-size: 0.8rem; overflow: hidden;" x-html="window.renderAvatarHtml(getMemberAvatar(item.createdBy))"></div>
+                        <strong style="color: var(--text-primary);" x-text="getMemberName(item.createdBy)"></strong>
+                      </div>
+                      <div style="display: flex; gap: var(--space-2);" x-show="isOwnerOrAdmin(item.createdBy)">
+                        <button class="btn" @click="openEditModal(item)" style="padding: 4px 8px; font-size: 12px; font-weight: normal; background: transparent; color: var(--sky-400); border: 1px solid transparent;">Sửa</button>
+                        <button class="btn" @click="deleteItem(item)" style="padding: 4px 8px; font-size: 12px; font-weight: normal; background: transparent; color: var(--coral-400); border: 1px solid transparent;">Xoá</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -318,29 +333,44 @@ export function renderSchedule() {
         <div>
           <div class="badge sky" style="font-size: var(--fs-lg); margin-bottom: var(--space-6); padding: var(--space-2) var(--space-6);">Ngày 2 (31/05)</div>
           
-          <div style="position: relative; padding-left: var(--space-4); border-left: 2px dashed rgba(56, 189, 248, 0.3);">
+          <div style="position: relative;">
             <template x-for="item in day2Items" :key="item.id">
-              <div class="glass-card animate-fade-in" style="margin-bottom: var(--space-4); position: relative; padding: var(--space-4);" :style="\`border-left: 4px solid var(--\${getCategoryColor(item.category)}-400);\`">
-                <div style="position: absolute; left: -21px; top: 20px; width: 12px; height: 12px; border-radius: 50%;" :style="\`background: var(--\${getCategoryColor(item.category)}-400); box-shadow: 0 0 10px var(--\${getCategoryColor(item.category)}-400);\`"></div>
-                
-                <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
-                  <div style="font-weight: bold; color: var(--emerald-400); font-family: var(--font-heading); font-size: var(--fs-xl);">
-                    <span x-text="item.startTime"></span> <span x-show="item.endTime" style="color: var(--text-secondary); font-size: var(--fs-sm); font-family: var(--font-body);"> - <span x-text="item.endTime"></span></span>
-                  </div>
-                  <div class="badge" :class="getCategoryColor(item.category)" x-text="getCategoryName(item.category)"></div>
+              <div class="animate-fade-in" style="display: flex; gap: var(--space-4); margin-bottom: 0; position: relative; min-height: 100px;">
+                <!-- Cột thời gian bên trái -->
+                <div style="width: 70px; flex-shrink: 0; text-align: right; padding-top: 6px;">
+                  <div style="font-weight: bold; font-family: var(--font-heading); font-size: var(--fs-xl); color: var(--sky-400);" x-text="item.startTime"></div>
+                  <div x-show="item.endTime" style="color: var(--text-secondary); font-size: var(--fs-sm); margin-top: 2px;" x-text="item.endTime"></div>
                 </div>
 
-                <h3 style="font-size: var(--fs-lg); margin-bottom: var(--space-1);" x-text="item.title"></h3>
-                <p style="color: var(--text-secondary); font-size: var(--fs-sm); margin-bottom: var(--space-4);" x-show="item.desc" x-text="item.desc"></p>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: var(--space-2);">
-                  <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); color: var(--text-secondary);">
-                    <div class="avatar" style="width: 24px; height: 24px; font-size: 0.8rem; overflow: hidden;" x-html="window.renderAvatarHtml(getMemberAvatar(item.createdBy))"></div>
-                    <span x-text="getMemberName(item.createdBy)"></span>
+                <!-- Trục thời gian ở giữa -->
+                <div style="position: relative; width: 2px; background: rgba(56, 189, 248, 0.2); display: flex; justify-content: center;">
+                  <!-- Dấu chấm tròn -->
+                  <div style="position: absolute; top: 12px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bg-deep);" 
+                       :style="\`background: var(--\${getCategoryColor(item.category)}-400); box-shadow: 0 0 10px var(--\${getCategoryColor(item.category)}-400);\`">
                   </div>
-                  <div style="display: flex; gap: var(--space-2);" x-show="isOwnerOrAdmin(item.createdBy)">
-                    <button class="btn-icon" @click="openEditModal(item)" title="Sửa" style="padding: 4px;">✏️</button>
-                    <button class="btn-icon" @click="deleteItem(item)" title="Xoá" style="padding: 4px;">🗑️</button>
+                </div>
+
+                <!-- Cột nội dung bên phải -->
+                <div style="flex: 1; padding-bottom: var(--space-6);">
+                  <div class="glass-card" style="padding: var(--space-4); margin-bottom: 0;" :style="\`border-left: 4px solid var(--\${getCategoryColor(item.category)}-400);\`">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                      <h3 style="font-size: var(--fs-lg); margin-bottom: 0;" x-text="item.title"></h3>
+                      <div class="badge" :class="getCategoryColor(item.category)" x-text="getCategoryName(item.category)"></div>
+                    </div>
+                    
+                    <p style="color: var(--text-secondary); font-size: var(--fs-sm); margin-bottom: var(--space-4);" x-show="item.desc" x-text="item.desc"></p>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: var(--space-2);">
+                      <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); color: var(--text-secondary);">
+                        <span>Người tạo:</span>
+                        <div class="avatar" style="width: 24px; height: 24px; font-size: 0.8rem; overflow: hidden;" x-html="window.renderAvatarHtml(getMemberAvatar(item.createdBy))"></div>
+                        <strong style="color: var(--text-primary);" x-text="getMemberName(item.createdBy)"></strong>
+                      </div>
+                      <div style="display: flex; gap: var(--space-2);" x-show="isOwnerOrAdmin(item.createdBy)">
+                        <button class="btn" @click="openEditModal(item)" style="padding: 4px 8px; font-size: 12px; font-weight: normal; background: transparent; color: var(--sky-400); border: 1px solid transparent;">Sửa</button>
+                        <button class="btn" @click="deleteItem(item)" style="padding: 4px 8px; font-size: 12px; font-weight: normal; background: transparent; color: var(--coral-400); border: 1px solid transparent;">Xoá</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
