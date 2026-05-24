@@ -42,9 +42,9 @@ export function renderFooter() {
 
       <!-- Copyright -->
       <div style="border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: var(--space-6); text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
-        <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; letter-spacing: 0.5px;">
-          © 2026 Summer Chill Trip. Designed & Developed with <span style="color: var(--coral-400); animation: pulse 2s infinite;">❤️</span> for the homies.
-        </p>
+        <div style="font-size: 0.85rem; color: var(--text-dim); text-align: center;">
+          © 2026 Summer Chill Trip. Designed & Developed with <span style="color: var(--coral-400); animation: pulse 2s infinite;">❤️</span> by Khải for the homies.
+        </div>
         <div style="display: flex; gap: var(--space-4); margin-top: var(--space-2); opacity: 0.3;">
           <span style="width: 4px; height: 4px; border-radius: 50%; background: white;"></span>
           <span style="width: 4px; height: 4px; border-radius: 50%; background: white;"></span>
