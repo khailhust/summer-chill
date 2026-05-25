@@ -44,7 +44,11 @@ export function showOnboarding() {
           closeModal();
         } catch (error) {
           console.error(error);
-          showToast('Đăng nhập thất bại. Bạn đã bật Google Auth chưa?', 'error');
+          if (error.message === 'ADBLOCK_DETECTED') {
+            showToast('Vui lòng tắt Trình chặn quảng cáo (Adblock) để có thể đăng nhập!', 'error');
+          } else {
+            showToast('Đăng nhập thất bại. Vui lòng thử lại!', 'error');
+          }
           // Reset button state
           btn.innerHTML = `
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style="width: 24px; height: 24px; background: white; border-radius: 50%; padding: 2px;" />

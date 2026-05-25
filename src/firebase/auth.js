@@ -21,13 +21,13 @@ export async function loginWithGoogle() {
     return userCredential.user;
   } catch (error) {
     console.warn("Lỗi đăng nhập Google Popup:", error.code);
+    // Nếu lỗi do bị chặn mạng (điển hình của AdGuard/Adblock chặn API Google)
+    if ((error.code === 'auth/network-request-failed' || error.code === 'auth/internal-error') && navigator.onLine) {
+      throw new Error('ADBLOCK_DETECTED');
+    }
     
-    // Nếu lỗi do trình duyệt/Adblock chặn Popup hoặc lỗi mạng cross-origin
-    if (error.code === 'auth/popup-blocked' || 
-        error.code === 'auth/network-request-failed' || 
-        error.code === 'auth/internal-error' || 
-        error.code === 'auth/cancelled-popup-request') {
-      
+    // Nếu lỗi do trình duyệt chặn Popup đơn thuần (VD: Safari, In-app browser)
+    if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
       console.log("Đang thử lại bằng phương thức Redirect...");
       // Gọi signInWithRedirect (sẽ tải lại toàn bộ trang chuyển hướng sang Google)
       signInWithRedirect(auth, googleProvider);
@@ -95,4 +95,9 @@ getRedirectResult(auth).then(async (result) => {
   }
 }).catch(error => {
   console.error("Lỗi getRedirectResult:", error);
+  if ((error.code === 'auth/network-request-failed' || error.code === 'auth/internal-error') && navigator.onLine) {
+    setTimeout(() => {
+      alert("Hệ thống phát hiện Trình chặn quảng cáo (Adblock) đang ngăn cản quá trình đăng nhập. Vui lòng tắt Adblock cho trang này và tải lại (F5)!");
+    }, 1000);
+  }
 });
