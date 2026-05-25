@@ -29,6 +29,9 @@ export async function loginWithGoogle() {
     // Nếu lỗi do trình duyệt chặn Popup đơn thuần (VD: Safari, In-app browser)
     if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
       console.log("Đang thử lại bằng phương thức Redirect...");
+      // Đánh dấu đã bắt đầu redirect vào sessionStorage (vì Adblock thường xoá auth state)
+      sessionStorage.setItem('auth_redirect_started', 'true');
+      
       // Gọi signInWithRedirect (sẽ tải lại toàn bộ trang chuyển hướng sang Google)
       signInWithRedirect(auth, googleProvider);
       return null;
@@ -85,15 +88,25 @@ export async function updateUserProfile(name, avatar, email) {
 
 // Xử lý kết quả đăng nhập sau khi redirect về
 getRedirectResult(auth).then(async (result) => {
+  const redirectStarted = sessionStorage.getItem('auth_redirect_started');
+  
   if (result && result.user) {
+    sessionStorage.removeItem('auth_redirect_started');
     const user = result.user;
     const name = user.displayName || 'Thành viên';
     const avatar = user.photoURL || '👤';
     const email = user.email || '';
     await updateUserProfile(name, avatar, email);
     console.log("Đã cập nhật profile sau khi redirect thành công.");
+  } else if (redirectStarted === 'true' && !auth.currentUser) {
+    // Nếu có cờ redirect nhưng Firebase trả về null không có lỗi -> Adblock đã xoá IndexedDB/Storage
+    sessionStorage.removeItem('auth_redirect_started');
+    setTimeout(() => {
+      alert("Hệ thống phát hiện Trình chặn quảng cáo (Adblock) đã chặn quá trình xác thực của Google. Vui lòng tắt Adblock (Tạm dừng trên trang này) và thử đăng nhập lại!");
+    }, 1000);
   }
 }).catch(error => {
+  sessionStorage.removeItem('auth_redirect_started');
   console.error("Lỗi getRedirectResult:", error);
   if ((error.code === 'auth/network-request-failed' || error.code === 'auth/internal-error') && navigator.onLine) {
     setTimeout(() => {
