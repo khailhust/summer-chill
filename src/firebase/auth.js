@@ -1,4 +1,4 @@
-import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, updateProfile, signOut } from "firebase/auth";
+import { signInWithPopup, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, updateProfile, signOut } from "firebase/auth";
 import { ref, set, serverTimestamp, onDisconnect } from "firebase/database";
 import { auth, database } from "./config.js";
 
@@ -20,7 +20,20 @@ export async function loginWithGoogle() {
     const userCredential = await signInWithPopup(auth, googleProvider);
     return userCredential.user;
   } catch (error) {
-    console.error("Lỗi đăng nhập Google:", error);
+    console.warn("Lỗi đăng nhập Google Popup:", error.code);
+    
+    // Nếu lỗi do trình duyệt/Adblock chặn Popup hoặc lỗi mạng cross-origin
+    if (error.code === 'auth/popup-blocked' || 
+        error.code === 'auth/network-request-failed' || 
+        error.code === 'auth/internal-error' || 
+        error.code === 'auth/cancelled-popup-request') {
+      
+      console.log("Đang thử lại bằng phương thức Redirect...");
+      // Gọi signInWithRedirect (sẽ tải lại toàn bộ trang chuyển hướng sang Google)
+      signInWithRedirect(auth, googleProvider);
+      return null;
+    }
+    
     throw error;
   }
 }
