@@ -99,10 +99,10 @@ getRedirectResult(auth).then(async (result) => {
     await updateUserProfile(name, avatar, email);
     console.log("Đã cập nhật profile sau khi redirect thành công.");
   } else if (redirectStarted === 'true' && !auth.currentUser) {
-    // Nếu có cờ redirect nhưng Firebase trả về null không có lỗi -> Adblock đã xoá IndexedDB/Storage
+    // Nếu có cờ redirect nhưng Firebase trả về null không có lỗi -> Trình chặn quảng cáo/Privacy extension đã xoá IndexedDB/Storage
     sessionStorage.removeItem('auth_redirect_started');
     setTimeout(() => {
-      alert("Hệ thống phát hiện Trình chặn quảng cáo (Adblock) đã chặn quá trình xác thực của Google. Vui lòng tắt Adblock (Tạm dừng trên trang này) và thử đăng nhập lại!");
+      alert("Hệ thống phát hiện có Trình chặn quảng cáo hoặc Tiện ích chặn theo dõi đang ngăn cản quá trình đăng nhập. Vui lòng tạm tắt các tiện ích này trên trang web và thử đăng nhập lại!");
     }, 1000);
   }
 }).catch(error => {
@@ -110,7 +110,7 @@ getRedirectResult(auth).then(async (result) => {
   console.error("Lỗi getRedirectResult:", error);
   if ((error.code === 'auth/network-request-failed' || error.code === 'auth/internal-error') && navigator.onLine) {
     setTimeout(() => {
-      alert("Hệ thống phát hiện Trình chặn quảng cáo (Adblock) đang ngăn cản quá trình đăng nhập. Vui lòng tắt Adblock cho trang này và tải lại (F5)!");
+      alert("Hệ thống phát hiện có Trình chặn quảng cáo hoặc Tiện ích chặn theo dõi đang ngăn cản quá trình đăng nhập. Vui lòng tạm tắt các tiện ích này trên trang web và tải lại (F5)!");
     }, 1000);
   }
 });

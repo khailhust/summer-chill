@@ -45,7 +45,7 @@ export function showOnboarding() {
         } catch (error) {
           console.error(error);
           if (error.message === 'ADBLOCK_DETECTED') {
-            showToast('Vui lòng tắt Trình chặn quảng cáo (Adblock) để có thể đăng nhập!', 'error');
+            showToast('Vui lòng tắt các Trình chặn quảng cáo/Chặn theo dõi để có thể đăng nhập!', 'error');
           } else {
             showToast('Đăng nhập thất bại. Vui lòng thử lại!', 'error');
           }
