@@ -28,6 +28,10 @@ export function showOnboarding() {
 
         try {
           const user = await loginWithGoogle();
+          
+          // Trình duyệt đang chuyển hướng, không làm gì thêm để tránh báo lỗi
+          if (!user) return;
+          
           // Lấy name và avatar từ Google Profile
           const name = user.displayName || 'Thành viên';
           // Sử dụng ảnh đại diện Google

@@ -1,4 +1,4 @@
-import { signInWithPopup, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, updateProfile, signOut } from "firebase/auth";
+import { signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from "firebase/auth";
 import { ref, set, serverTimestamp, onDisconnect } from "firebase/database";
 import { auth, database } from "./config.js";
 
@@ -82,3 +82,17 @@ export async function updateUserProfile(name, avatar, email) {
   // Thiết lập trạng thái offline khi ngắt kết nối
   onDisconnect(memberRef).update({ isOnline: false });
 }
+
+// Xử lý kết quả đăng nhập sau khi redirect về
+getRedirectResult(auth).then(async (result) => {
+  if (result && result.user) {
+    const user = result.user;
+    const name = user.displayName || 'Thành viên';
+    const avatar = user.photoURL || '👤';
+    const email = user.email || '';
+    await updateUserProfile(name, avatar, email);
+    console.log("Đã cập nhật profile sau khi redirect thành công.");
+  }
+}).catch(error => {
+  console.error("Lỗi getRedirectResult:", error);
+});
